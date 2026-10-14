@@ -40,7 +40,7 @@ body.shk #c{animation:bs .05s infinite}@keyframes bs{0%{transform:translate(-10p
 #danger{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(150,0,0,.8) 100%)}
 #camoff{position:absolute;left:50%;top:44%;transform:translateX(-50%);font-size:22px;color:#fff;background:rgba(0,0,0,.75);padding:16px 22px;border:3px solid #fff;display:none;white-space:nowrap}
 #load{position:fixed;inset:0;background:#000;z-index:50;display:flex;align-items:center;justify-content:center;font-size:14px}
-</style></head><body>
+html,body{touch-action:none;overscroll-behavior:none}@media(max-width:820px){#mapw{width:44vw;right:4px;bottom:56px;padding:3px;border-width:2px}#camname{font-size:11px;left:8px;top:8px}#camb{padding:9px 20px;font-size:11px;bottom:8px}#camoff{font-size:13px;padding:10px 12px}#mside{width:50vw}#mmon{height:50vh}#mtitle{font-size:24px}#tp{width:240px}}</style></head><body>
 <canvas id="c"></canvas>
 <div id="grain"></div><div id="ovig"></div><div id="danger"></div><div id="vhud"></div><div id="hud"><div id="pwb"><div id="pw"></div><div id="us"></div></div><div id="tb"><div id="clk">12 AM</div><div id="nt"></div></div></div>
 <button id="camb">CAMERA</button>
@@ -259,7 +259,7 @@ box(office,.95,.62,.08,0,1.4,-3.96,M(0x16161a));B.heat=mkBtn(0,1.4,.78,.5,'HEAT\
 function setBtn(b,on){const t=on?b.userData.mn:b.userData.mo;b.material[4].map=t;b.material[4].needsUpdate=true}
 const shutter=box(office,4.9,1.8,.08,0,4.9,-3.9,new THREE.MeshLambertMaterial({map:ctex(32,64,(c,W,H)=>{c.fillStyle='#34363c';c.fillRect(0,0,W,H);c.fillStyle='#1c1d21';for(let y=0;y<H;y+=8)c.fillRect(0,y,W,2)})}));
 const VENT={};[-1,1].forEach(s=>{const k=s<0?'L':'R',x=s*8.93,z=-3.1,y=1.2;box(office,.05,.95,1.25,x,y,z,M(0x1b1c20));const lm=new THREE.MeshBasicMaterial({color:0x4a3a18});const lp=new THREE.Mesh(new THREE.PlaneGeometry(1.05,.75),lm);lp.position.set(s*8.9,y,z);lp.rotation.y=-s*Math.PI/2;office.add(lp);
-for(let i=0;i<4;i++)box(office,.04,.05,1.05,s*8.87,y-.27+i*.18,z,M(0x101114));VENT[k]={light:lm}});
+for(let i=0;i<4;i++)box(office,.04,.05,1.05,s*8.87,y-.27+i*.18,z,M(0x101114));for(let j=0;j<7;j++)box(office,.04,.8,.04,s*8.86,y,z-.5+j*.17,M(0x0c0d10));VENT[k]={light:lm}});
 const EYE={};['L','R'].forEach((k,i)=>{const s=i?1:-1,g=new THREE.Group();[-.22,.22].forEach(dx=>{const m=new THREE.Mesh(new THREE.CircleGeometry(.09,10),new THREE.MeshBasicMaterial({color:0xfff2c0}));m.position.set(dx,0,0);g.add(m)});g.position.set(s*6.6,1.9,-6.6);g.visible=false;office.add(g);EYE[k]=g});
 // office posters
 poster(office,-3.95,3.15,-3.98,0,1.5,1.1,['STAFF RULES','1. NO RUNNING','2. WATCH POWER','3. SURVIVE'],'#d8d0a8','#222');
@@ -347,7 +347,7 @@ const ROOMS={
 SC:{n:'SUPPLY CLOSET',cam:[[-62.5,2.6,-57.5],[-60,.9,-62],66],li:[[-60,2.8,-59],.55,0xd8c8a0,1],spots:[[-60,-61.2,'S'],[-58.5,-60,'S'],[-61.5,-59.4,'S'],[-61,-59.8,'C'],[-58.7,-60.8,'C'],[-60,-58.6,'C']]},
 WH:{n:'WEST HALL',cam:[[-6.6,2.7,-19.4],[-6.6,1.4,-4],64],li:[[-6.6,3,-12],.9,0xe0ecff,1],spots:[[-6.6,-8.5,'S'],[-6.6,-12.5,'S'],[-6.6,-15.5,'S'],[-7.2,-10.5,'C'],[-6,-13.8,'C'],[-6.6,-7,'C']]},
 EH:{n:'EAST HALL',cam:[[6.6,2.7,-19.4],[6.6,1.4,-4],64],li:[[6.6,3,-12],.9,0xe0ecff,1],spots:[[6.6,-8.5,'S'],[6.6,-12.5,'S'],[6.6,-15.5,'S'],[6,-10.5,'C'],[7.2,-13.8,'C'],[6.6,-7,'C']]},
-K:{n:'KITCHEN',cam:[[54.6,3.1,-55.6],[61,.8,-61.5],68],li:[[60,3.2,-60],1.1,0xe8f0e0,1],spots:[[58,-62.6,'S'],[62.6,-62.2,'S'],[56,-61.3,'S'],[60,-57.8,'C'],[56,-58.6,'C'],[63.5,-57.8,'C']]},
+K:{n:'KITCHEN',cam:[[54.6,3.1,-55.6],[61,.8,-61.5],68],li:[[60,3.2,-60],.6,0xe8f0e0,1],spots:[[58,-62.6,'S'],[62.6,-62.2,'S'],[56,-61.3,'S'],[60,-57.8,'C'],[56,-58.6,'C'],[63.5,-57.8,'C']]},
 PP:{n:'PLAY PLACE',cam:[[-4,3.3,-21.3],[1,1,-9],70],li:[[0,3.6,-13],.7,0xc0b0ff,1],spots:[[0,-11,'S'],[-.6,-17,'S'],[1.4,-8.2,'S'],[-1.4,-12,'C'],[2.2,-10.5,'C'],[-3,-8.5,'C']]},
 BA:{n:'BATHROOM',cam:[[-55.9,3,-96.4],[-60,1,-102],66],li:[[-60,2.8,-99],.9,0xc8e8e0,1],spots:[[-60,-100.2,'S'],[-62.3,-99.2,'S'],[-57.8,-100.4,'S'],[-58.5,-99.5,'C'],[-61,-100.8,'C'],[-60,-98.5,'C']]},
 DA:{n:'DINING AREA',cam:[[-10.2,3.7,-72.8],[1,.8,-83],72],li:[[0,3.6,-79],.5,0xe0d0c0,1],spots:[[0,-80,'S'],[4.2,-79,'S'],[-4,-81.6,'S'],[2,-76.8,'C'],[-2,-78.2,'C'],[5,-82.5,'C']]},
@@ -356,6 +356,52 @@ SH:{n:'SOUTH HALL',cam:[[0,2.7,-179.2],[0,1.2,-161],64],li:[[0,3,-170],.9,0xe8f0
 EN:{n:'ENTRANCE',cam:[[-5.3,3.1,-205.6],[0,1,-214],68],li:[[0,3.3,-210],.7,0xa8b8ff,1],spots:[[0,-211,'S'],[-3.2,-210,'S'],[3.2,-209.6,'S'],[-1.5,-208.6,'C'],[2,-212.4,'C'],[-3,-212.6,'C']]}};
 const CAMS=['SC','WH','EH','K','PP','BA','DA','NH','SH','EN'];
 const ADJ={EN:['SH'],SH:['EN','DA','WH','EH'],WH:['SH','SC','BA'],EH:['SH','K'],SC:['WH'],BA:['WH','DA'],DA:['SH','NH','BA','K','PP'],NH:['DA','PP','K'],K:['DA','NH','EH'],PP:['DA','NH']};
+
+// ---- extra camera rooms + decor rooms
+function extraRooms(){let g;
+g=new THREE.Group();scene.add(g);shell(g,60,-100,12,10,3.6,checker('#1a1a2a','#10101c',6,5),wallMat(0x2a2050,'tile',6,2));
+for(let i=0;i<8;i++){const x=54.6+i*1.4,c=[0xff3080,0x30d0ff,0x70ff40,0xffc030][i%4];box(g,.95,1.9,.8,x,.95,-104.5,M(0x1c1c28));box(g,.75,.55,.02,x,1.55,-104.08,MB(c));box(g,.8,.1,.6,x,1.15,-103.9,M(0x333344));}
+for(let i=0;i<4;i++){const x=55.5+i*2.4,c=[0xff3080,0x30d0ff,0x70ff40,0xffc030][i];box(g,.9,1.7,.8,x,.85,-98,M(0x22222e));box(g,.7,.5,.02,x,1.4,-97.58,MB(c));}
+box(g,1.6,1.1,1,66,.55,-99,M(0x502020));box(g,1.2,.6,.02,66,1.4,-98.5,MB(0xff4040));cyl(g,.35,.35,.5,64.5,.25,-102,M(0xc03030),10);
+sign(g,60,3.0,-104.88,0,3,.5,'ARCADE','#201040','#40ffe0');lampBox(g,60,3.55,-100,1.4,.4,0x6060c0);
+g=new THREE.Group();scene.add(g);shell(g,60,-140,12,10,3.6,checker('#c8a0d8','#8860a8',6,5),wallMat(0xd87898,'tile',6,2));
+box(g,7,1,1.1,60,.5,-137,M(0x6a4a2a));box(g,7,.06,1.1,60,1.02,-137,M(0xd8c090));
+for(let r=0;r<3;r++){box(g,10,.06,.7,60,.9+r*.9,-144.5,M(0x7a5a38));for(let i=0;i<10;i++)box(g,.5,.5,.4,55.5+i,1.2+r*.9,-144.5,M([0xff6090,0x60d0ff,0xffe040,0x80ff60,0xc080ff][(i+r)%5]))}
+for(let i=0;i<5;i++)cyl(g,.25,.25,.5,57+i*1.5,1.3,-137,M([0xff4060,0x40b0ff,0xffd030,0x60e060,0xb070ff][i]),8);
+box(g,1,2,.8,65,1,-138,M(0x303060));box(g,.7,.4,.02,65,1.6,-137.58,MB(0xffff60));
+sign(g,60,3.1,-144.88,0,3.6,.5,'PRIZE CORNER','#6a1040','#ffe060');lampBox(g,60,3.55,-140,1.4,.4,0xe8d8a0);
+// decor rooms (no cameras, monsters never go here)
+g=new THREE.Group();scene.add(g);shell(g,-60,-140,10,8,3.2,checker('#a0402a','#703020',5,4),wallMat(0xe0b040,'tile',5,2));
+box(g,5,.1,1.4,-60,.8,-140,M(0x8a5a2a));for(let i=0;i<5;i++)cyl(g,.15,.15,.4,-62+i,1.05,-140,M([0xff4060,0x40b0ff,0xffd030,0x60e060,0xb070ff][i]),8);sign(g,-60,2.6,-143.88,0,2.4,.4,'PARTY ROOM','#401030','#ffe060');
+g=new THREE.Group();scene.add(g);shell(g,-60,-180,10,8,3.2,M(0x3a3a3a),M(0x666660));
+for(let i=0;i<8;i++)box(g,R(.8,1.3),R(.6,1.2),R(.8,1.2),-63+i*.9,.4,-182+(i%2)*2,M(0x8a6a44));sign(g,-60,2.6,-183.88,0,2.4,.4,'STORAGE','#222','#ddd');
+g=new THREE.Group();scene.add(g);shell(g,60,-180,10,8,3.2,checker('#6a6a70','#505058',5,4),wallMat(0x70809a,'tile',5,2));
+box(g,2.4,.8,1.1,60,.4,-183,M(0x5a4a3a));box(g,.7,.5,.1,60,1.1,-183.3,M(0x16161a));box(g,.5,.9,.5,62,.45,-182,M(0x888890));sign(g,60,2.6,-183.88,0,2.4,.4,'MANAGER','#222','#ddd')}
+extraRooms();
+const mkSp=(cx,cz)=>[[cx-2,cz-2.6,'S'],[cx+2.6,cz-2.2,'S'],[cx-4,cz-1.3,'S'],[cx,cz+2.2,'C'],[cx-4,cz+1.4,'C'],[cx+3.5,cz+2.2,'C']];
+ROOMS.AR={n:'ARCADE',cam:[[54.6,3.1,-95.6],[61,.8,-101.5],68],li:[[60,3.2,-100],.5,0x9080ff,1],spots:mkSp(60,-60+(-40)).map(a=>a)};
+ROOMS.PC={n:'PRIZE CORNER',cam:[[54.6,3.1,-135.6],[61,.8,-141.5],68],li:[[60,3.2,-140],.6,0xffd8f0,1],spots:mkSp(60,-140)};
+ROOMS.AR.spots=mkSp(60,-100);
+CAMS.push('AR','PC');ADJ.AR=['K','PC','DA'];ADJ.PC=['AR','NH'];ADJ.K.push('AR');ADJ.DA.push('AR');ADJ.NH.push('PC');
+
+function kidArt(g,x,y,z,ry,w,h,k){const t=ctex(96,Math.round(96*h/w),(c,W,H)=>{c.fillStyle=['#f4f0e0','#fff8d0','#e8f0f8'][k%3];c.fillRect(0,0,W,H);c.lineWidth=3;const cl=['#e02020','#2060e0','#20a030','#e0a000','#a030c0'];c.strokeStyle=cl[k%5];
+if(k%4===0){c.beginPath();c.arc(W*.3,H*.3,10,0,7);c.stroke();c.strokeStyle=cl[(k+2)%5];c.strokeRect(W*.4,H*.5,W*.4,H*.35);c.beginPath();c.moveTo(W*.38,H*.5);c.lineTo(W*.6,H*.28);c.lineTo(W*.82,H*.5);c.stroke()}
+else if(k%4===1){c.beginPath();c.arc(W*.5,H*.3,9,0,7);c.moveTo(W*.5,H*.4);c.lineTo(W*.5,H*.7);c.moveTo(W*.3,H*.5);c.lineTo(W*.7,H*.5);c.moveTo(W*.5,H*.7);c.lineTo(W*.35,H*.9);c.moveTo(W*.5,H*.7);c.lineTo(W*.65,H*.9);c.stroke()}
+else if(k%4===2){c.beginPath();for(let i=0;i<6;i++){c.moveTo(10+i*13,H*.9);c.lineTo(10+i*13+6,H*.35+(i%3)*8)}c.stroke();c.strokeStyle=cl[(k+1)%5];c.beginPath();c.arc(W*.8,H*.2,8,0,7);c.stroke()}
+else{c.beginPath();c.moveTo(8,H*.8);for(let i=0;i<8;i++)c.lineTo(8+i*11,H*(i%2?.4:.75));c.stroke();c.strokeStyle=cl[(k+3)%5];c.beginPath();c.arc(W*.7,H*.25,9,0,7);c.stroke()}});
+const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:t,color:0xaaaaaa}));m.position.set(x,y,z);m.rotation.y=ry;g.add(m)}
+function decorate(){const P=[['PIZZA','NIGHT!'],['NO','RUNNING'],['SMILE!'],['PARTY','TIME'],['WELCOME'],['EAT','MORE']],bg=['#a02020','#2040a0','#208040','#a07010','#702090'],S4=[-1.05,-.35,.35,1.05];let n=0;
+const walls=[];[['SC',-60,-60,6,6],['K',60,-60,12,10],['BA',-60,-100,9,8],['DA',0,-80,22,16],['EN',0,-210,12,10],['AR',60,-100,12,10],['PC',60,-140,12,10]].forEach(([id,cx,cz,w,d])=>{for(let i=0;i<4;i++){const f=(i+.5)/4,xx=cx-w/2+f*w;walls.push([xx,cz-d/2+.06,0,id]);walls.push([xx,cz+d/2-.06,Math.PI,id])}});
+walls.forEach(([x,z,ry,id],i)=>{const q=i*7+3,y=1.7+(q%5)*.12;if(q%3===0)poster(scene,x,y,z,ry,.7,.95,P[q%6],bg[q%5],'#fff');else if(q%3===1)kidArt(scene,x,y,z,ry,.65,.85,q);else if(i%2===0)kidArt(scene,x+.5,y-.2,z,ry,.5,.65,q+1)});
+[[-6.6,-17,-8.5],[6.6,-17,-8.5]].forEach(([cx,z0,z1])=>{for(let i=0;i<5;i++){const z=z0+1.2+i*1.6;kidArt(scene,cx-1.29,1.7,z,Math.PI/2,.55,.7,i+n++);kidArt(scene,cx+1.29,1.7,z+.5,-Math.PI/2,.55,.7,i+n++)}});
+[-139,-121,-178,-162].forEach((z,i)=>{if(i%2)return;const z1=i<2?-121:-162;for(let j=0;j<5;j++){const zz=z+2+j*3.3;kidArt(scene,-1.94,1.7,zz,Math.PI/2,.6,.8,j+n++);poster(scene,1.94,1.8,zz+1,-Math.PI/2,.6,.8,P[(j+i)%6],bg[j%5],'#fff')}});
+// pizza boxes in kitchen + other clutter
+let g=new THREE.Group();scene.add(g);for(let s=0;s<3;s++){const bx=[64,55,60.5][s],bz=[-56,-56.5,-63.6][s],y0=s===2?.93:0,hh=[5,3,4][s];for(let i=0;i<hh;i++){box(g,.95,.07,.95,bx+Math.sin(i*2+s)*.04,y0+.04+i*.08,bz,M(0xc89a58));box(g,.9,.01,.9,bx,y0+.08+i*.08,bz,M(0xf0e0c0))}}
+box(g,.95,.07,.95,57,1.0,-64.4,M(0xc89a58));
+g=new THREE.Group();scene.add(g);[[-4,-80],[6,-86],[-7,-73]].forEach(a=>{for(let i=0;i<3;i++)box(g,.9,.07,.9,a[0],.04+i*.08,a[1],M(0xc89a58))});
+[[-9,-90],[9,-72]].forEach(a=>{[0xff4060,0x40b0ff,0xffd030].forEach((c,i)=>{cyl(g,.16,.14,.01,a[0]+i*.1,2.5+i*.2,a[1],M(c),10);cyl(g,.01,.01,2,a[0]+i*.1,1.5+i*.1,a[1],M(0xdddddd),4)})});
+}
+decorate();
 function bfs(goal){const d={};d[goal]=0;const q=[goal];while(q.length){const a=q.shift();ADJ[a].forEach(b=>{if(d[b]===undefined){d[b]=d[a]+1;q.push(b)}})}return d}
 const DIST={L:bfs('WH'),R:bfs('EH'),W:bfs('PP')};
 
@@ -371,16 +417,16 @@ let saved=1,beat=false;try{saved=+localStorage.getItem('stn_night')||1;beat=loca
 if(/extras/.test(location.hash))beat=true;
 // h = real height in metres (feet * .3048). tg = where it can show up (L/R doors, W window, V vent)
 const MON=[
-{img:'stalker1',h:2.13,reg:1,tg:['L','R'],door:'corner',bias:0},
-{img:'treepeek3',h:2.44,reg:1,tg:['L'],door:'corner',cam:'corner',bias:0},
-{img:'treepeek1_1',h:2.44,reg:1,tg:['L'],door:'corner',cam:'corner',bias:0},
-{img:'holepeek',h:.75,reg:1,tg:['L','R'],crawl:1,bias:0},
-{img:'stalker6_2',h:2.95,reg:1,tg:['L','R'],door:'corner',gaze:1,bias:0},
-{img:'hunter',h:2.44,reg:1,tg:['L','R'],door:'corner',bias:0},
-{img:'cave_stalker',h:.37,reg:1,tg:['L','R'],door:'corner',cam:'corner',peek:1,bias:0},
+{img:'stalker1',h:3.5,reg:1,tg:['L','R','V','W'],door:'corner',bias:0},
+{img:'treepeek3',h:2.44,reg:1,tg:['L','R','V','W'],door:'corner',cam:'corner',bias:0},
+{img:'treepeek1_1',h:2.44,reg:1,tg:['L','R','V','W'],door:'corner',cam:'corner',bias:0},
+{img:'holepeek',h:1.0,reg:1,tg:['L','R','V','W'],crawl:1,bias:0},
+{img:'stalker6_2',h:2.95,reg:1,tg:['L','R','V','W'],door:'corner',gaze:1,bias:0},
+{img:'hunter',h:2.44,reg:1,tg:['L','R','V','W'],door:'corner',bias:0},
+{img:'cave_stalker',h:.37,reg:1,tg:['L','R','V','W'],door:'corner',cam:'corner',peek:1,bias:0},
 {img:'evilstalker',h:2.74,evil:1},
 {img:'knocker_window2',h:.72,scr:'knock'},
-{img:'window_peek',h:.37,reg:1,tg:['L','R'],door:'corner',cam:'corner',peek:1,bias:0},
+{img:'window_peek',h:.37,reg:1,tg:['L','R','V','W'],door:'corner',cam:'corner',peek:1,bias:0},
 {img:'stalker10',h:2.74,scr:'s10'}];
 const NAMES=['THE STALKER','TREE PEEKER B','THE WATCHER','HOLE PEEKER','LONG LEGS','THE HUNTER','CAVE FACE','EVIL STALKER','KNOCKER','WINDOW PEEKER','THE LAUGHER'];
 Object.assign(FACE,{cave_stalker:{fx:.5,fy:.45,fh:.8},evilstalker:{fx:.5,fy:.13,fh:.27},hunter:{fx:.49,fy:.16,fh:.3},holepeek:{fx:.4,fy:.25,fh:.4},treepeek1_1:{fx:.62,fy:.27,fh:.5},knocker_window2:{fx:.38,fy:.33,fh:.31}});
@@ -396,7 +442,7 @@ if(fade){const g=x.createLinearGradient(0,c.height*(1-fade),0,c.height);g.addCol
 const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return VARS[k]={tex:t,u0:sx/W,v0:sy/H,fw:sw/W,fh:sh/H}}
 function initMon(){MON.forEach((m,i)=>{m.idx=i;m.asp=TEX[m.img].a;const me=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:getVar(m,'full').tex,transparent:true,alphaTest:.04,side:THREE.DoubleSide}));me.rotation.order='YXZ';me.visible=false;me.renderOrder=5;scene.add(me);m.mesh=me;m.curVar=getVar(m,'full');m.lv=0;m.room='DA';m.st='room';m.off=true;m.mv5=5});buildCorners()}
 // room rectangles (cx,cz,w,d) -> corner spots visible from each camera
-const RD={SC:[-60,-60,6,6],WH:[-6.6,-12,2.6,16],EH:[6.6,-12,2.6,16],K:[60,-60,12,10],PP:[0,-13,9,18],BA:[-60,-100,9,8],DA:[0,-80,22,16],NH:[0,-130,4,24],SH:[0,-170,4,20],EN:[0,-210,12,10]};
+const RD={SC:[-60,-60,6,6],WH:[-6.6,-12,2.6,16],EH:[6.6,-12,2.6,16],K:[60,-60,12,10],PP:[0,-13,9,18],BA:[-60,-100,9,8],DA:[0,-80,22,16],NH:[0,-130,4,24],SH:[0,-170,4,20],EN:[0,-210,12,10],AR:[60,-100,12,10],PC:[60,-140,12,10]};
 const CORN={};
 function buildCorners(){CAMS.forEach(id=>{const[cx,cz,w,d]=RD[id],cam=ROOMS[id].cam[0],tg=ROOMS[id].cam[1],dir=new THREE.Vector3(tg[0]-cam[0],0,tg[2]-cam[2]).normalize(),pts=[],L=[];
 [-1,1].forEach(sx=>[-1,1].forEach(sz=>pts.push([cx+sx*(w/2-.3),cz+sz*(d/2-.3),-sx,-sz])));[-1,1].forEach(sx=>pts.push([cx+sx*(w/2-.3),cz,-sx,0]));
@@ -410,11 +456,11 @@ function setLevels(){const cnt=Math.min(8,S.night*2),on=new Set(ORDER.slice(0,cn
 MON.forEach((m,i)=>{if(m.reg)m.lv=on.has(i)?Math.max(1,Math.min(20,Math.round(AGG[S.night-1]*D.agg+m.bias))):0;else if(m.scr==='s10')m.lv=S.night>=2?1:0;else if(m.scr==='knock')m.lv=0;else if(m.evil)m.lv=S.night>=5?1:0});
 S.gate=GATE[S.night-1]*HOUR;poolInit()}
 function poolInit(){const en=REG().sort(()=>Math.random()-.5);en.forEach((m,i)=>{m.off=i>=5;m.mv5=5});MON.forEach(m=>{if(!m.reg)m.off=true;if(m.reg&&!m.lv)m.off=true});REG().filter(m=>!m.off).forEach(m=>m.room=null);REG().filter(m=>!m.off).forEach(m=>{m.room=m.shown=startRoom(m)});S.rotT=R(30,55)}
-function startRoom(ex){const L=['SC','K','PP','BA','DA','NH','SH','EN'],f=L.filter(r=>!MON.some(o=>o!==ex&&o.room===r&&!o.off)),l=f.length?f:L;return l[RI(0,l.length-1)]}
+function startRoom(ex){const L=['SC','K','PP','BA','DA','NH','SH','EN','AR','PC'],f=L.filter(r=>!MON.some(o=>o!==ex&&o.room===r&&!o.off)),l=f.length?f:L;return l[RI(0,l.length-1)]}
 function rotatePool(){const on=REG().filter(m=>!m.off&&m.st==='room'),offs=REG().filter(m=>m.off);if(!offs.length||!on.length)return;const a=on[RI(0,on.length-1)],b=offs[RI(0,offs.length-1)];a.off=true;a.mesh.visible=false;b.off=false;b.mv5=5;b.room=null;b.room=b.shown=startRoom(b);b.st=b.showSt='room';b.moves=0;b.goalK=pickGoal(b);b.cd=R(10,20);rndPose(b);b.walk=null;b.cr=null}
 function syncShown(){MON.forEach(m=>{if(S.mode==='view'){m.shown=S.camRoom;m.showSt='room'}else{m.shown=m.room;m.showSt=m.st}})}
 function resetNight(){const D=DIFF[S.diff];HOUR=D.hour;NIGHT_LEN=HOUR*6;START=Math.round(NIGHT_LEN/8*2.6);
-S.t=0;S.power=START;S.pwT=0;S.cam=false;S.out=false;S.outT=0;S.eyes=false;S.glitch=0;S.camRoom='DA';S.yaw=0;S.shut=false;S.heat=false;S.camDown={};S.evil=0;S.evBusy=0;S.pan10=null;S.shardT=0;S.testKill=false;
+S.mbDone=false;S.mbAt=R(1.4,4.6)*HOUR;S.t=0;S.power=START;S.pwT=0;S.cam=false;S.out=false;S.outT=0;S.eyes=false;S.glitch=0;S.camRoom='DA';S.yaw=0;S.shut=false;S.heat=false;S.camDown={};S.evil=0;S.evBusy=0;S.pan10=null;S.shardT=0;S.testKill=false;
 S.t10=R(70,120)*(S.diff==='easy'?1.4:S.diff==='hard'?.8:1);S.tkn=R(60,110)*(S.diff==='easy'?1.4:S.diff==='hard'?.8:1);
 A.stopSong&&A.stopSong();A.stopBox&&A.stopBox();glass.visible=true;SHARD.forEach(s=>s.m.visible=false);
 doors.L.closed=doors.R.closed=false;S.lights={L:0,R:0,W:0};['doorL','doorR','lightL','lightR','lightW','shutW','heat'].forEach(k=>setBtn(B[k],false));EYE.L.visible=EYE.R.visible=false;
@@ -472,11 +518,11 @@ if(m.st==='door'){m.br-=dt;if(m.br<=0){m.br=R(3.5,6);A.mon(m.idx,pn(k))}
 if(m.holeLeave&&!doors[k].closed){m.away-=dt;if(m.away<=0)leave(m);return}
 if(doors[k].closed){m.away-=dt;if(m.away<=0)leave(m)}else{m.at-=dt;if(m.at<=0)kill(m)}return}
 if(m.st==='vent'){m.br-=dt;if(m.br<=0){m.br=R(3,5);A.vent(pn(k));A.mon(m.idx,pn(k))}
-if(S.heat)m.expo+=dt;else m.expo=Math.max(0,m.expo-dt*.4);m.at-=dt;if(m.expo>=2.6)leave(m);else if(m.at<=0)kill(m);return}
+if(S.heat)m.expo+=dt;else m.expo=Math.max(0,m.expo-dt*.4);m.at-=dt;if(m.expo>=2.6)leave(m);else if(m.at<=0)leave(m);return}
 if(m.st==='window'){m.wt+=dt;m.br-=dt;if(m.br<=0){m.br=m.scr==='knock'?R(1,1.8):R(3.5,6);m.scr==='knock'?A.knock():A.mon(m.idx,0)}
 if(S.shut){m.away-=dt;if(m.away<=0)leave(m);return}
 m.at-=dt;if(!m.evil&&!m.scr){if(S.lights.W)m.expo+=dt;else m.expo=Math.max(0,m.expo-dt*.5)}
-if(m.expo>=3.2)leave(m);else if(m.at<=0)kill(m)}}
+if(m.scr==='knock'&&m.at<=0)kill(m);else if(m.expo>=3.2||m.at<=0)leave(m)}}
 
 // ---- shards (window break)
 const SHARD=[];for(let i=0;i<44;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(.1+Math.random()*.12,.14+Math.random()*.16),new THREE.MeshBasicMaterial({color:0xb8d4e6,transparent:true,opacity:.75,side:THREE.DoubleSide}));m.visible=false;scene.add(m);SHARD.push({m,v:new THREE.Vector3(),r:new THREE.Vector3()})}
@@ -528,7 +574,7 @@ $('camb').onclick=()=>{toggleCam();$('camb').blur()};
 addEventListener('keydown',e=>{if(/INPUT|SELECT/.test(e.target.tagName))return;
 if(S.mode==='view'){if(e.code==='Escape')exitView();else if(/^Digit[1-3]$/.test(e.code)){$('xvp').value=e.code[5];viewSetup()}else if(e.code==='ArrowLeft'||e.code==='ArrowRight'){cyc('xvm',e.code==='ArrowRight'?1:-1)}else if(e.code==='ArrowUp'||e.code==='ArrowDown'){cyc('xvr',e.code==='ArrowDown'?1:-1)}return}
 if(e.code==='Space'){e.preventDefault();toggleCam()}
-else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^Digit[0-9]$/.test(e.code)){const n=+e.code[5];gotoCam(n===0?9:n-1)}});
+else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^Digit[0-9]$/.test(e.code)){const n=+e.code[5];gotoCam(n===0?9:n-1)}else if(e.code==='Minus')gotoCam(10);else if(e.code==='Equal')gotoCam(11)});
 $('start').onclick=()=>{S.night=1;saved=1;try{localStorage.setItem('stn_night',1)}catch(e){}startNight()};$('cont').onclick=()=>{S.night=saved;startNight()};
 $('diff').onclick=()=>{const k=Object.keys(DIFF);S.diff=k[(k.indexOf(S.diff)+1)%3];try{localStorage.setItem('stn_diff',S.diff)}catch(e){}$('diff').textContent='DIFFICULTY: '+DIFF[S.diff].n};
 let rsT=0;$('reset').onclick=()=>{if(!rsT){$('reset').textContent='CLICK AGAIN: WIPE EVERYTHING';rsT=setTimeout(()=>{rsT=0;$('reset').textContent='RESET SAVE'},3500);return}clearTimeout(rsT);rsT=0;try{localStorage.removeItem('stn_night');localStorage.removeItem('stn_beat');localStorage.removeItem('stn_diff')}catch(e){}saved=1;beat=false;S.diff='normal';toMenu();$('reset').textContent='SAVE WIPED'};
@@ -542,45 +588,46 @@ me.position.set(o.x,y,o.z);me.rotation.set(0,Math.atan2(o.c.position.x-o.x,o.c.p
 const fitDoor=(m,v)=>Math.min(3.0/(m.h*v.fh),1.9/(m.h*m.asp*v.fw));
 function placeDoor(m,r,c){const s=r==='WH'?-1:1,jx=m.jx||0,jz=m.jz||0,now=performance.now();
 if(m.crawl){sprite(m,'full',{x:s*6.6+jx*.5,z:-5.0+jz*.3,bottom:0,sc:1.4,c,tilt:Math.sin(now/400)*.05});return}
-if(m.door==='corner'){const fx=FACE[m.img].fx,keepL=s<0,type=fx<.5?'cl':'cr',flip=(fx<.5)!==keepL,v=getVar(m,type),Wk=m.h*m.asp*v.fw;sprite(m,type,{x:s*6.3+(keepL?-1:1)*(Wk/2-.05),z:-4.7,bottom:0,flip,c,tilt:s*.1});return}
+if(m.door==='corner'){const fx=FACE[m.img].fx,keepL=s<0,type=fx<.5?'cl':'cr',flip=(fx<.5)!==keepL,v=getVar(m,type),Wk=m.h*m.asp*v.fw;sprite(m,type,{x:s*6.3+(keepL?-1:1)*(Wk/2-.05),z:-4.7,bottom:(m.h<.8&&!m.crawl)?1.4:0,flip,c,tilt:s*.1});return}
 if(m.evil){const sc=fitDoor(m,getVar(m,'full'));sprite(m,'full',{x:s*6.6,z:-5.2,bottom:0,sc,c});return}
 if(m.peek10){sprite(m,'half',{x:s*6.3+jx*.3,z:-4.55,top:3.05,c,tilt:s*.22+Math.sin(now/260)*.04});return}
 const bend=m.gaze?1:0;sprite(m,'half',{x:s*6.6+jx*.4,z:-5.3,top:bend?m.h*.85:Math.min(m.h,3.0),c,tilt:bend?-s*.3:s*.05})}
 function placeWindow(m,c){const rr=Math.min(1,m.wt/.45),e=1-Math.pow(1-rr,3),sk=Math.max(0,Math.min(1,(m.wt-.45)/Math.max(1,m.wtot-.45))),x=m.wx,now=performance.now();
 if(m.peek){const fx=FACE[m.img].fx,odd=(m.seed%2)===1;sprite(m,fx<.5?'cl':'cr',{x,z:-4.9,bottom:1.2+e*.68-sk*.15,flip:odd,c,tilt:.28*(odd?-1:1)});return}
-if(m.scr==='knock'){sprite(m,'head',{x:m.wx*.5,z:-4.75,bottom:2.1,c,tilt:Math.sin(now/90)*.05});return}
+if(m.scr==='knock'||m.h>=.8){const v=getVar(m,'head'),sc=m.h<.8?1:Math.min(3,.9/(m.h*v.fh));sprite(m,'head',{x:m.wx*.5,z:-4.75,bottom:1.7+e*.6-sk*.2,sc,c,tilt:Math.sin(now/300)*.12});return}
+if(0){sprite(m,'head',{x:m.wx*.5,z:-4.75,bottom:2.1,c,tilt:Math.sin(now/90)*.05});return}
 if(m.evil){const sc=Math.min(1.3,3.2/m.h);sprite(m,'full',{x,z:-4.9,bottom:3.3-m.h*sc,sc,c});return}
 sprite(m,'full',{x,z:-4.9,bottom:(1.5-m.h)+e*1.8-sk*.35,c})}
-function placeVent(m,c){const s=m.goalK==='L'?-1:1;sprite(m,'full',{x:s*8.74,z:-3.1+(m.jz||0)*.25,y:1.2,sc:1.15,c})}
+function placeVent(m,c){const s=m.goalK==='L'?-1:1,v=getVar(m,'head'),sc=m.h<.8?1:Math.min(3,.7/(m.h*v.fh));sprite(m,'head',{x:s*8.89,z:-3.1+(m.jz||0)*.2,y:1.2,sc,c,tilt:s*.12})}
 function cornerSprite(m,p,c,bottom){const fx=FACE[m.img].fx,type=fx<.5?'cl':'cr',v=getVar(m,type),Wk=m.h*m.asp*v.fw,th=Math.atan2(c.position.x-p.x,c.position.z-p.z),xa={x:Math.cos(th),z:-Math.sin(th)},keepL=(p.ix*xa.x+p.iz*xa.z)<0,flip=(fx<.5)!==keepL,sg=keepL?-1:1;
-sprite(m,type,{x:p.x+xa.x*sg*(Wk/2),z:p.z+xa.z*sg*(Wk/2),bottom,flip,c,tilt:(m.peek?.3:.08)*(keepL?-1:1)})}
+sprite(m,type,{x:p.x+xa.x*sg*(Wk/2),z:p.z+xa.z*sg*(Wk/2),bottom,flip,c,tilt:((m.peek||(m.h<.8&&!m.crawl))?.3:.08)*(keepL?-1:1)})}
 function spot(m,r,cnt,kind){const L=ROOMS[r].spots.filter(s=>s[2]===kind),k=r+kind;cnt[k]=cnt[k]||0;const q=L[((m.seed||0)+cnt[k]++)%L.length];return[q[0]+(m.jx||0),q[1]+(m.jz||0)]}
 function placeRoom(m,r,c,cnt){const me=m.mesh,ck=r+'x';cnt[ck]=(cnt[ck]||0)+1;const idx=(m.seed||0)+cnt[ck],L=CORN[r]||[{x:0,z:0,ix:1,iz:0}],p=L[idx%L.length];
-if(m.cam==='corner'){cornerSprite(m,p,c,m.peek?[0,.55,1.1][m.seed%3]:0);return}
+if(m.cam==='corner'){cornerSprite(m,p,c,(m.h<.8&&!m.crawl)?[.9,1.3,1.7][m.seed%3]:m.peek?[0,.55,1.1][m.seed%3]:0);return}
 if(m.crawl){let x=p.x+p.ix*.55,z=p.z+p.iz*.55,op=1;if(m.cr){const q=m.cr.t/m.cr.dur,rd=RD[r]||[0,0,2,2],dx=x-rd[0],dz=z-rd[1],dl=Math.hypot(dx,dz)||1,off=m.cr.ph===0?q*3.2:(1-q)*3.2;x+=dx/dl*off;z+=dz/dl*off;op=m.cr.ph===0?1-q*.9:.1+q*.9}
 me.material.opacity=op;sprite(m,'full',{x,z,bottom:0,sc:1.1,c,tilt:Math.sin(performance.now()/500)*.06});return}
 let x,z,y0=0;
 if(m.walk&&HX[r]!==undefined&&m.st==='room'){const q=m.walk.t/m.walk.dur,u=m.walk.rev?1-q:q;x=HX[r]+Math.sin(m.walk.t*3)*.12;z=HZ[r][0]+(HZ[r][1]-HZ[r][0])*u;y0=Math.abs(Math.sin(m.walk.t*5))*.07}
 else{const q=spot(m,r,cnt,'S');x=q[0];z=q[1]}
-sprite(m,'full',{x,z,bottom:y0,c});
+sprite(m,'full',{x,z,bottom:y0,c});{const rd=RD[r];if(rd){const hw=Math.abs(me.scale.x)*.45,lx=Math.max(0,rd[2]/2-.35-hw),lz=Math.max(0,rd[3]/2-.5);me.position.x=Math.max(rd[0]-lx,Math.min(rd[0]+lx,me.position.x));me.position.z=Math.max(rd[1]-lz,Math.min(rd[1]+lz,me.position.z))}}
 if(m.gz){const g=m.gz,pp=Math.min(1,g.t/g.dur),e=pp<.6?(pp/.6)*(pp/.6):1,f=FACE[m.img],dir=new THREE.Vector3();cctv.getWorldDirection(dir);const end=cctv.position.clone().addScaledVector(dir,1.5);end.y=cctv.position.y-(.5-f.fy)*me.scale.y;end.x-=(f.fx-.5)*Math.abs(me.scale.x)*.5;me.position.lerp(end,e);me.rotation.z=pp>.55?Math.sin((pp-.55)*18)*.35+.4:0}}
 function place(){const cnt={};MON.forEach(m=>{const me=m.mesh;
 if(S.mode==='dying'&&m===S.dm){dyPlace(m);return}
 let v=false,r,st,b=1;me.material.opacity=1;
-if(S.cam){r=m.shown;st=m.showSt;if(act(m)&&r===S.camRoom&&!(S.camDown[r]>0)){v=true;b=Math.min(1,.42+ROOMS[r].li[1]*.55)}}
-else{r=m.room;st=m.st;if(act(m)){if(st==='window'){v=true;b=m.evil?1:S.lights.W?1:.38}else if(st==='vent'){v=true;b=S.heat?.8+Math.random()*.2:.85}else if(st==='door')v=!!S.lights[r==='WH'?'L':'R']||m.peek10||m.evil;else v=(r==='WH'&&!!S.lights.L)||(r==='EH'&&!!S.lights.R)||(r==='PP'&&!!S.lights.W)}}
+if(S.cam){r=m.shown;st=m.showSt;if(act(m)&&r===S.camRoom&&!(S.camDown[r]>0)){v=true;b=Math.min(1,.3+ROOMS[r].li[1]*.4)}}
+else{r=m.room;st=m.st;if(act(m)){if(st==='window'){v=!!S.lights.W||m.evil;b=1}else if(st==='vent'){v=true;b=S.heat?.8+Math.random()*.2:.85}else if(st==='door')v=!!S.lights[r==='WH'?'L':'R']||m.peek10||m.evil;else v=(r==='WH'&&!!S.lights.L)||(r==='EH'&&!!S.lights.R)||(r==='PP'&&!!S.lights.W)}}
 if(!v){me.visible=false;return}
 me.visible=true;me.material.color.setScalar(b);const c=S.cam?cctv:player;
 if(!S.cam&&st==='door')placeDoor(m,r,c);else if(!S.cam&&st==='window')placeWindow(m,c);else if(!S.cam&&st==='vent')placeVent(m,c);else placeRoom(m,r,c,cnt)})}
 
 // ---- map
-const MAP={EN:[92,4,56,24],SH:[92,36,56,24],BA:[8,76,56,28],DA:[92,76,56,28],K:[176,76,56,28],NH:[134,118,50,26],PP:[70,118,56,40],WH:[8,126,40,64],SC:[8,198,40,26],EH:[192,126,40,64]};
-const SHORT={SC:'SUPPLY',WH:'W HALL',EH:'E HALL',K:'KITCHEN',PP:'PLAY',BA:'BATH',DA:'DINING',NH:'N HALL',SH:'S HALL',EN:'ENTRY'};
-function buildMap(){let s='<svg viewBox="0 0 240 258" xmlns="http://www.w3.org/2000/svg">';const c=id=>[MAP[id][0]+MAP[id][2]/2,MAP[id][1]+MAP[id][3]/2],seen={};
+const MAP={EN:[92,4,56,24],SH:[92,36,56,24],BA:[8,76,56,28],DA:[92,76,56,28],K:[176,76,56,28],NH:[134,118,50,26],PP:[70,118,56,40],WH:[8,126,40,64],SC:[8,198,40,26],EH:[192,126,40,64],AR:[236,76,56,28],PC:[236,118,56,40]};
+const SHORT={SC:'SUPPLY',WH:'W HALL',EH:'E HALL',K:'KITCHEN',PP:'PLAY',BA:'BATH',DA:'DINING',NH:'N HALL',SH:'S HALL',EN:'ENTRY',AR:'ARCADE',PC:'PRIZES'};
+function buildMap(){let s='<svg viewBox="0 0 300 258" xmlns="http://www.w3.org/2000/svg">';const c=id=>[MAP[id][0]+MAP[id][2]/2,MAP[id][1]+MAP[id][3]/2],seen={};
 Object.keys(ADJ).forEach(a=>ADJ[a].forEach(b=>{const k=[a,b].sort().join();if(seen[k])return;seen[k]=1;const p=c(a),q=c(b);s+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#fff" stroke-width="3"/>`}));
 s+='<line x1="28" y1="190" x2="84" y2="226" stroke="#fff" stroke-width="3"/><line x1="212" y1="190" x2="156" y2="226" stroke="#fff" stroke-width="3"/><line x1="98" y1="158" x2="120" y2="214" stroke="#fff" stroke-width="3" stroke-dasharray="4 3"/><text x="124" y="190" fill="#aaa" font-size="5">WINDOW</text>';
 CAMS.forEach((id,i)=>{const m=MAP[id];s+=`<g class="mb" data-id="${id}"><rect x="${m[0]}" y="${m[1]}" width="${m[2]}" height="${m[3]}" fill="#000" stroke="#fff" stroke-width="2"/><text x="${m[0]+m[2]/2}" y="${m[1]+m[3]/2-1}" text-anchor="middle" fill="#fff" font-size="7">${String(i+1).padStart(2,'0')}</text><text x="${m[0]+m[2]/2}" y="${m[1]+m[3]/2+9}" text-anchor="middle" fill="#fff" font-size="6">${SHORT[id]}</text></g>`});
-s+='<rect x="84" y="214" width="72" height="30" fill="#000" stroke="#fff" stroke-width="2"/><text x="120" y="233" text-anchor="middle" fill="#fff" font-size="8">OFFICE</text></svg>';$('map').innerHTML=s;
+[['PARTY',8,4,70,26],['STORAGE',8,36,70,26],['MANAGER',236,164,56,26]].forEach(a=>{s+=`<rect x="${a[1]}" y="${a[2]}" width="${a[3]}" height="${a[4]}" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="3 2"/><text x="${a[1]+a[3]/2}" y="${a[2]+a[4]/2+2}" text-anchor="middle" fill="#555" font-size="6">${a[0]}</text>`});s+='<rect x="84" y="214" width="72" height="30" fill="#000" stroke="#fff" stroke-width="2"/><text x="120" y="233" text-anchor="middle" fill="#fff" font-size="8">OFFICE</text></svg>';$('map').innerHTML=s;
 document.querySelectorAll('.mb').forEach(g=>g.addEventListener('click',()=>{if(S.camRoom===g.dataset.id)return;S.camRoom=g.dataset.id;glitch(.3);A.blip();syncShown();updMapSel()}))}
 function updMapSel(){document.querySelectorAll('.mb').forEach(g=>{const on=g.dataset.id===S.camRoom;g.firstChild.setAttribute('fill',on?'#fff':(S.camDown[g.dataset.id]>0?'#5a0000':'#000'));g.querySelectorAll('text').forEach(t=>t.setAttribute('fill',on?'#000':'#fff'))});const i=CAMS.indexOf(S.camRoom);$('camname').textContent='CAM '+String(i+1).padStart(2,'0')+' - '+ROOMS[S.camRoom].n}
 
@@ -637,7 +684,7 @@ if(0){S.tkn-=dt;if(S.tkn<=0){S.tkn=R(70,130)*(S.diff==='easy'?1.4:S.diff==='hard
 MON.forEach(m=>{tickMon(m,dt);if(m.walk){m.walk.t+=dt;if(m.walk.t>=m.walk.dur)m.walk=null}if(m.cr){m.cr.t+=dt;if(m.cr.t>=m.cr.dur){if(m.cr.ph===0){m.shown=m.room;m.showSt=m.st;m.cr=(S.cam&&S.camRoom===m.room)?{t:0,dur:3.2,ph:1}:null}else m.cr=null}}});
 S.rotT-=dt;if(S.rotT<=0){S.rotT=R(30,55);if(S.evil===0)rotatePool()}
 const th=MON.find(m=>act(m)&&slot(m));S.dg=th?Math.max(0,1-th.at/7)*((th.st==='door'&&doors[th.goalK].closed)||(th.st==='window'&&S.shut)?.25:1):0;if(th){S.hbT-=dt;if(S.hbT<=0){S.hbT=Math.max(.38,.35+th.at*.09);A.beat()}}
-S.mbT=(S.mbT===undefined?R(40,90):S.mbT)-rdt;if(S.mbT<=0&&!S.out&&S.mode==='play'&&!S.evil){S.mbT=R(70,150);A.playBox(false,.35)}S.amb-=rdt;if(S.amb<=0){S.amb=R(4,9)*(1-.07*S.night);A.amb()}
+if(!S.mbDone&&S.mbAt!==undefined&&S.t>=S.mbAt&&!S.out&&S.mode==='play'&&!S.evil){S.mbDone=true;A.playBox(false,.4);const cc=CAMS[RI(0,CAMS.length-1)];S.camDown[cc]=60;glitch(.4)}S.amb-=rdt;if(S.amb<=0){S.amb=R(4,9)*(1-.07*S.night);A.amb()}
 A.setBuzz((S.lights.L?1:0)+(S.lights.R?1:0)+(S.lights.W?1:0))}}
 // pan
 if(!S.cam){if(S.mode==='dying'){const tg=S.dyType==='window'?0:(S.dm.goalK==='L'?.5:-.5);S.yaw+=(tg-S.yaw)*Math.min(1,rdt*5)}else if(S.pan10&&S.mode==='play'){S.yaw+=((S.pan10==='L'?.5:-.5)-S.yaw)*Math.min(1,rdt*3)}else if(S.out&&S.mode==='play'){S.yaw+=((S.outSide==='L'?.5:-.5)-S.yaw)*Math.min(1,rdt*.6)}else{const a=Math.abs(S.mx),pan=a>.3?Math.min(1,(a-.3)/.6)*Math.sign(S.mx):0;S.yaw+=(-pan*.5-S.yaw)*Math.min(1,rdt*4)}
@@ -650,7 +697,7 @@ if(!S.cam){corrL.visible=zv.L>.03;corrR.visible=zv.R>.03;PPg.visible=zv.W>.03}el
 hallL.intensity=hallR.intensity=winL.intensity=0;lamp.intensity=S.out?0:(fl<.02?.28:.55);
 ['L','R'].forEach(k=>{const ven=MON.some(m=>act(m)&&m.st==='vent'&&m.goalK===k);VENT[k].light.color.setHex(S.heat&&!S.out?0xff6a10:ven?(Math.random()<.5?0xa88a40:0x5a4a20):(S.out?0x0c0a06:0x4a3a18))});
 const downNow=S.cam&&S.camDown[S.camRoom]>0;
-if(S.cam&&!downNow){const li=ROOMS[S.camRoom].li;camL.position.set(li[0][0],li[0][1],li[0][2]);camL.color.setHex(li[2]);camL.intensity=li[1]*(Math.random()<.04?.25:1.25)}else camL.intensity=0;
+if(S.cam&&!downNow){const li=ROOMS[S.camRoom].li;camL.position.set(li[0][0],li[0][1],li[0][2]);camL.color.setHex(li[2]);camL.intensity=li[1]*(Math.random()<.04?.2:.62)}else camL.intensity=0;
 place();
 const dgv=S.mode==='play'?Math.round((S.dg||0)*20)/20:0;if(lastTxt.dg!==dgv){lastTxt.dg=dgv;$('danger').style.opacity=dgv}
 const pl=S.mode==='play'||S.mode==='dying'||S.mode==='dead'||S.mode==='win'||S.mode==='intro';setDisp('hud',pl?'block':'none');setDisp('camb',S.mode==='play'?'block':'none');
@@ -667,6 +714,10 @@ if(S.cam){if(!downNow){const r=ROOMS[S.camRoom];cctv.position.set(...r.cam[0]);c
 else renderer.render(scene,player)}
 // ---- boot
 async function boot(){$('c').replaceWith(renderer.domElement);renderer.domElement.id='c';
+let tx=0,tmv=0;const cv=renderer.domElement;
+cv.addEventListener('touchstart',e=>{A.resume();tx=e.touches[0].clientX;tmv=0},{passive:true});
+cv.addEventListener('touchmove',e=>{if(S.cam)return;e.preventDefault();const x=e.touches[0].clientX,dx=x-tx;tx=x;tmv+=Math.abs(dx);S.mx=Math.max(-1,Math.min(1,S.mx-dx/innerWidth*3.2))},{passive:false});
+cv.addEventListener('touchend',e=>{e.preventDefault();if(tmv>12||S.mode!=='play'||S.cam)return;const t=e.changedTouches[0],ox=S.mx,oy=S.my;S.mx=t.clientX/innerWidth*2-1;S.my=-(t.clientY/innerHeight*2-1);const b=pick();S.mx=ox;S.my=oy;if(b)act2(b.userData.action)},{passive:false});
 renderer.domElement.addEventListener('mousedown',e=>{A.resume();if(S.mode!=='play'||S.cam)return;S.mx=e.clientX/innerWidth*2-1;S.my=-(e.clientY/innerHeight*2-1);const b=pick();if(b)act2(b.userData.action)});
 try{await Promise.race([document.fonts.load('13px PS2P'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
 await loadImgs();buildButtons();initMon();buildMap();buildExtras();resize();addEventListener('resize',resize);
@@ -678,7 +729,7 @@ const st=document.createElement('style');st.textContent='#tp{position:fixed;left
 const p=document.createElement('div');p.id='tp';
 const mo=MON.map((m,i)=>`<option value="${i}">${i+1}. ${NAMES[i]}</option>`).join('');
 const lo=CAMS.map(id=>`<option value="${id}">${ROOMS[id].n}</option>`).join('')+'<option value="DL">LEFT DOOR</option><option value="DR">RIGHT DOOR</option><option value="WIN">WINDOW</option><option value="VL">LEFT VENT</option><option value="VR">RIGHT VENT</option>';
-p.innerHTML=`<b>TEST PANEL</b> (CTRL+C OR TILDE)<div id="tst"></div><h3>SUMMON MONSTER</h3><select id="tm">${mo}</select><select id="tl">${lo}</select><button id="tsum">SUMMON</button><button id="tclr">SEND ALL AWAY</button><h3>MONSTER LOCATIONS</h3><div id="tloc" style="font-size:8px;line-height:1.7"></div><h3>JUMPSCARES</h3><button id="tsc">RAW JUMPSCARE (SELECTED)</button><button id="tkd">REAL DOOR LUNGE (SELECTED)</button><button id="tkw">REAL WINDOW BREAK (SELECTED)</button><h3>SCRIPTED EVENTS</h3><button id="te10">THE LAUGHER EVENT</button><button id="tekn">KNOCKER (DISABLED)</button><button id="teev">EVIL STALKER 5AM SEQUENCE</button><button id="teev2">SKIP TO EVIL HUNT</button><button id="tefall">MAKE CURRENT CAMERA FALL OUT</button><button id="tefix">FIX ALL CAMERAS</button><div class="r"><button id="tso1">SONG 1</button><button id="tso2">SONG 2</button><button id="tso3">BOX</button><button id="tso0">STOP</button></div><h3>TIME (HOUR 0-5.9)</h3><div class="r"><input type="number" id="th" min="0" max="5.9" step="0.5" value="0"><button id="tht">SET</button></div><h3>NIGHT</h3><div class="r"><select id="tn"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><button id="tnb">SET</button></div><button id="trs">RESTART NIGHT</button><h3>DOOR TIMER (SEC, 0=AUTO)</h3><div class="r"><input type="number" id="ta" min="0" max="60" value="0"><button id="tab">SET</button></div><h3>OTHER</h3><label><input type="checkbox" id="tg"> GOD MODE (NO DEATH)</label><div class="r"><select id="tsp"><option value="1">SPEED 1x</option><option value="5">SPEED 5x</option><option value="20">SPEED 20x</option></select></div><div class="r"><input type="number" id="tpw" min="0" max="999" value="250"><button id="tpb">SET POWER</button></div>`;
+p.innerHTML=`<b>TEST PANEL</b> (CTRL+C OR TILDE)<div id="tst"></div><h3>SUMMON MONSTER</h3><select id="tm">${mo}</select><select id="tl">${lo}</select><button id="tsum">SUMMON</button><button id="tclr">SEND ALL AWAY</button><h3>MONSTER LOCATIONS</h3><div id="tloc" style="font-size:8px;line-height:1.7"></div><h3>JUMPSCARES</h3><button id="tsc">RAW JUMPSCARE (SELECTED)</button><button id="tkd">REAL DOOR LUNGE (SELECTED)</button><button id="tkw">REAL WINDOW BREAK (SELECTED)</button><h3>SCRIPTED EVENTS</h3><button id="te10">THE LAUGHER EVENT</button><button id="tekn">KNOCKER (WINDOW2) EVENT</button><button id="teev">EVIL STALKER 5AM SEQUENCE</button><button id="teev2">SKIP TO EVIL HUNT</button><button id="tefall">MAKE CURRENT CAMERA FALL OUT</button><button id="tefix">FIX ALL CAMERAS</button><div class="r"><button id="tso1">SONG 1</button><button id="tso2">SONG 2</button><button id="tso3">BOX</button><button id="tso0">STOP</button></div><h3>TIME (HOUR 0-5.9)</h3><div class="r"><input type="number" id="th" min="0" max="5.9" step="0.5" value="0"><button id="tht">SET</button></div><h3>NIGHT</h3><div class="r"><select id="tn"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><button id="tnb">SET</button></div><button id="trs">RESTART NIGHT</button><h3>DOOR TIMER (SEC, 0=AUTO)</h3><div class="r"><input type="number" id="ta" min="0" max="60" value="0"><button id="tab">SET</button></div><h3>OTHER</h3><label><input type="checkbox" id="tg"> GOD MODE (NO DEATH)</label><div class="r"><select id="tsp"><option value="1">SPEED 1x</option><option value="5">SPEED 5x</option><option value="20">SPEED 20x</option></select></div><div class="r"><input type="number" id="tpw" min="0" max="999" value="250"><button id="tpb">SET POWER</button></div>`;
 document.body.appendChild(p);
 const $$=id=>document.getElementById(id),msg=t=>{$$('tst').textContent=t;setTimeout(()=>{if($$('tst').textContent===t)$$('tst').textContent=''},2500)};
 setInterval(()=>{if(!p.classList.contains('show'))return;$$('tloc').innerHTML=MON.map((m,i)=>(i+1)+'.'+NAMES[i].slice(0,12)+': '+(m.lv?(m.off?'OFF-MAP':act(m)?(m.st==='room'?(ROOMS[m.room]||{n:m.room}).n:m.st.toUpperCase()+' '+m.goalK):'WAITING'):'OFF')).join('<br>')},500);
@@ -695,7 +746,7 @@ $$('tsc').onclick=()=>testScare(+$$('tm').value);
 $$('tkd').onclick=()=>{if(!playing())return;const m=MON[+$$('tm').value];place0(m,'DL');kill(m,true)};
 $$('tkw').onclick=()=>{if(!playing())return;const m=MON[+$$('tm').value];place0(m,'WIN');kill(m,true)};
 $$('te10').onclick=()=>{if(!playing())return;const m=MON[S10];m.lv=1;S.gate=0;S.evBusy=0;startS10();msg('LAUGHER STARTED')};
-$$('tekn').onclick=()=>{return msg('DISABLED');if(!playing())return;const m=MON[KNO];m.lv=1;S.gate=0;S.evBusy=0;MON.forEach(o=>{if(o!==m&&o.st==='window')leave(o)});startKnock();msg('KNOCKER STARTED')};
+$$('tekn').onclick=()=>{if(!playing())return;const m=MON[KNO];m.lv=1;S.gate=0;S.evBusy=0;MON.forEach(o=>{if(o!==m&&o.st==='window')leave(o)});startKnock();msg('KNOCKER STARTED')};
 $$('teev').onclick=()=>{if(!playing())return;S.night=Math.max(S.night,5);setLevels();S.t=5*HOUR;msg('5 AM SEQUENCE')};
 $$('teev2').onclick=()=>{if(!playing())return;MON[EVI].lv=1;if(S.evil===0)evilStart();A.stopSong();evilGo();msg('EVIL HUNT')};
 $$('tefall').onclick=()=>{S.camDown[S.camRoom]=60;msg('CAMERA FELL: '+ROOMS[S.camRoom].n)};
