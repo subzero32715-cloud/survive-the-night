@@ -255,7 +255,7 @@ const blades=new THREE.Group();blades.position.set(0,0,.05);fanG.add(blades);[0,
 cyl(office,.14,.16,.04,1.9,TOP+.02,-3.0,M(0x222222),10);box(office,.04,.7,.04,1.9,TOP+.37,-3.0,M(0x222222));const sh=cyl(office,.06,.24,.22,1.9,TOP+.78,-2.95,new THREE.MeshBasicMaterial({color:0xcaa060}),10);
 // buttons
 const buttons=[];
-function pixLabel(txt,bg,sub){return ctex(128,64,(c,W,H)=>{c.fillStyle=bg;c.fillRect(0,0,W,H);c.strokeStyle='#000';c.lineWidth=6;c.strokeRect(3,3,W-6,H-6);c.fillStyle='#fff';c.textAlign='center';c.font='13px PS2P, monospace';const L=txt.split('\n');L.forEach((l,i)=>c.fillText(l,W/2,H/2+5+(i-(L.length-1)/2)*18))})}
+function pixLabel(txt,bg,sub){return ctex(256,128,(c,W,H)=>{c.fillStyle=bg;c.fillRect(0,0,W,H);c.strokeStyle='#000';c.lineWidth=10;c.strokeRect(5,5,W-10,H-10);c.textAlign='center';c.font='bold 30px PS2P, monospace';const L=txt.split('\n');L.forEach((l,i)=>{const y=H/2+11+(i-(L.length-1)/2)*38;c.lineWidth=6;c.strokeStyle='#000';c.strokeText(l,W/2,y);c.fillStyle='#fff';c.fillText(l,W/2,y)})})}
 function mkBtn(x,y,w,h,txt,off,on,action){const mo=pixLabel(txt,off),mn=pixLabel(txt,on);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,.1),[MB(0x222222),MB(0x222222),MB(0x222222),MB(0x222222),new THREE.MeshBasicMaterial({map:mo,color:0xbbbbbb}),MB(0x222222)]);m.position.set(x,y,-3.9);m.userData={action,mo,mn,isBtn:true};office.add(m);buttons.push(m);return m}
 const B={};
 function buildButtons(){
@@ -686,7 +686,7 @@ function drawDStatic(){const d=dsid.data;for(let i=0;i<d.length;i+=4){const v=Ma
 let lastTxt={};
 function setTxt(id,t){if(lastTxt[id]!==t){lastTxt[id]=t;$(id).textContent=t}}
 function setDisp(id,v){if(lastTxt['d'+id]!==v){lastTxt['d'+id]=v;$(id).style.display=v}}
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(Math.floor(w*.42),Math.floor(h*.42),false);renderer.domElement.style.imageRendering='pixelated';player.aspect=cctv.aspect=w/h;player.updateProjectionMatrix();cctv.updateProjectionMatrix()}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(Math.floor(w*.85),Math.floor(h*.85),false);renderer.domElement.style.imageRendering='pixelated';player.aspect=cctv.aspect=w/h;player.updateProjectionMatrix();cctv.updateProjectionMatrix()}
 const ZT=[[.42,1,.78,.42],[.42,1,.78,.42],[.65,1,.88,.6],[.65,1,.88,.6],[1.05,.9,.95,1]],zv={L:0,R:0,W:0},zset={L:-1,R:-1,W:-1};
 let mapSig='';
 function frame(now){requestAnimationFrame(frame);const raw=(now-(S.fl||now))/1000,rdt=Math.min(.1,raw);S.fl=now;const dt=Math.min(.5,raw)*FAST*(TEST.speed||1);
