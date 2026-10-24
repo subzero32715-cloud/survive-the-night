@@ -1007,7 +1007,7 @@ if(sc.i<sc.path.length-1){sc.i++;const r=sc.path[sc.i],old=m.room;m.room=r;rndPo
 else{m.st='door';m.peek10=true;m.at=8;m.away=R(1.5,2.5);m.expo=0;m.br=1.5;m.jx=R(-.3,.3);m.jz=0;m.wt=0;m.cd=0;m.walk=null;m.scrP=null;vis(m,m.room);if(S.cam)toggleCam(true);S.pan10=m.goalK;A.laugh(pn(m.goalK))}}
 function evilStart(){S.evil=1;MON.forEach(m=>{if(m.evil)return;m.off=true;m.st='room';m.mesh.visible=false;m.scrP=null;m.peek10=false;m.walk=null;m.cr=null});S.pan10=null;S.evBusy=0;const e=MON[EVI];e.off=true;e.st='room';e.lv=1;A.playSong(1,false,()=>{if(S.evil===1)evilGo()})}
 function evilGo(){S.evil=2;A.playSong(2,false,()=>{if(S.evil===2)A.playSong(2,false)});const m=MON[EVI];m.off=false;m.lv=1;m.evT=R(1,2);m.st='room'}
-function tickEvil(m,dt){if(S.evil<2||m.st!=='room')return;m.evT-=dt;if(m.evT<=0){arrive(m,['L','R'][RI(0,1)]);m.at=8;m.away=R(.8,1.5)}}
+function tickEvil(m,dt){if(S.evil<2||m.st!=='room')return;m.evT-=dt;if(m.evT<=0){arrive(m,['L','R','W'][RI(0,2)]);m.at=8;m.away=R(.8,1.5)}}
 function tickGaze(m,dt){if(m.gz){m.gz.t+=dt;if(m.gz.t>=m.gz.dur){const r=m.room;m.gz=null;S.camDown[r]=60;glitch(1.2);A.noise(1,.5,{type:'highpass',f:900});if(S.cam&&S.camRoom===r)updMapSel();m.gazeM=R(6,11)}return}
 if(m.st==='room'&&S.cam&&S.camRoom===m.room&&!(S.camDown[m.room]>0)&&m.shown===m.room){m.gaze+=dt;if(m.gaze>=m.gazeM){m.gaze=0;m.gz={t:0,dur:1.6};A.mon(4,0)}}else m.gaze=Math.max(0,m.gaze-dt*.5)}
 const QN=[1,2,3,4,5];function quota(dt){S.wr=0;if(S.mode!=='play'||S.day||S.cam&&0)return;S.qT=(S.qT||0)-dt;if(S.qT>0||S.t<S.gate+8)return;S.qT=3;const need=Math.min(5,Math.ceil(QN[Math.min(4,S.night-1)]*Math.min(1,Math.max(.2,(S.t-S.gate)/(NIGHT_LEN*.5))))),act2=MON.filter(o=>act(o)&&slot(o)&&!o.scr&&!o.evil);if(act2.length>=need)return;const used=new Set(MON.filter(o=>act(o)&&slot(o)).map(slot)),c=MON.filter(o=>o.reg&&act(o)&&o.st==='room'&&!o.walk&&o.moves>=4&&!o.run);if(!c.length)return;const m=c[RI(0,c.length-1)],opts=['L','R','W','VL','VR'].filter(k=>!used.has(k)&&(k==='W'?m.tg.includes('W'):k[0]==='V'?m.tg.includes('V'):m.tg.includes(k)));if(!opts.length)return;const k=opts[RI(0,opts.length-1)];if(k[0]==='V')arriveVent(m,k[1]);else arrive(m,k)}
@@ -1024,7 +1024,7 @@ if(m.st==='vent'){m.br-=dt;if(m.br<=0){m.br=R(3,5);A.vent(pn(k));A.mon(m.idx,pn(
 if(S.heat)m.expo+=dt;else m.expo=Math.max(0,m.expo-dt*.4);m.at-=dt;if(m.expo>=2.6)repel(m);else if(m.at<=0){if(doors.L.closed||doors.R.closed)repel(m);else kill(m)}return}
 if(m.st==='window'){if(!S.shut)S.wr=Math.max(S.wr||0,1-m.at/(m.wtot||atkT()));m.wt+=dt;m.br-=dt;if(m.br<=0){m.br=m.scr==='knock'?R(1,1.8):R(3.5,6);m.scr==='knock'?A.knock():A.mon(m.idx,0)}
 if(m.lkd){m.kt-=dt;if(m.kt<=0){m.lkd=0;kill(m)}return}m.at-=dt;if(!m.evil&&!m.scr){if(S.lights.W)m.expo+=dt;else m.expo=Math.max(0,m.expo-dt*.5)}
-if(m.at<=0&&S.shut&&!m.scr&&!m.evil)repel(m);else if(m.at<=0){if(m.idx%3!==0&&!S.day&&!m.angry&&!m.scr&&!m.evil){m.lkd=1;m.kt=R(2.5,4);S.lockT=m.kt+.5;try{A.tone(60,1.5,'sawtooth',.4,{to:35})}catch(e){}}else kill(m)}else if(m.expo>=3.2)repel(m)}}
+if(m.at<=0&&S.shut&&!m.scr)repel(m);else if(m.at<=0){if(m.idx%3!==0&&!S.day&&!m.angry&&!m.scr&&!m.evil){m.lkd=1;m.kt=R(2.5,4);S.lockT=m.kt+.5;try{A.tone(60,1.5,'sawtooth',.4,{to:35})}catch(e){}}else kill(m)}else if(m.expo>=3.2)repel(m)}}
 
 // ---- shards (window break)
 const SHARD=[];for(let i=0;i<44;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(.1+Math.random()*.12,.14+Math.random()*.16),new THREE.MeshBasicMaterial({color:0xb8d4e6,transparent:true,opacity:.75,side:THREE.DoubleSide}));m.visible=false;scene.add(m);SHARD.push({m,v:new THREE.Vector3(),r:new THREE.Vector3()})}
@@ -1298,9 +1298,9 @@ for(const k in S.camDown){if(S.camDown[k]>0){S.camDown[k]-=dt;if(S.camDown[k]<=0
 S.pwT+=dt;if(S.pwT>=8){S.pwT-=8;if(!S.out&&!(S.pwFreeze>0)){S.power-=usage();if(S.power<=0){S.power=0;S.out=true;S.outT=0;S.eyes=false;A.playBox(true,.8);doors.L.closed=doors.R.closed=false;S.shut=false;S.lights.L=S.lights.R=S.lights.W=0;setBtn(B.doorL,0);setBtn(B.doorR,0);setBtn(B.shutW,0);setBtn(B.lightL,0);setBtn(B.lightR,0);setBtn(B.lightW,0);A.doorUp();S.pan10=null;S.outSide=S.yaw>.25?'R':'L';S.cam&&toggleCam();S.lights={L:0,R:0,W:0};S.shut=false;S.heat=false;doors.L.closed=doors.R.closed=false;['doorL','doorR','lightL','lightR','lightW','shutW','heat'].forEach(k=>setBtn(B[k],false));A.powerDown();A.setBuzz(0);$('camui').className=''}}}
 if(S.out){S.outT+=dt;if(S.outT>=7&&!S.eyes){S.eyes=true;A.eyes()}EYE[S.outSide].visible=S.eyes&&Math.random()>.08;if(S.outT>=10){A.musicbox();kill(firstOn())}}
 if(S.heat&&!S.out){S.heatT-=dt;if(S.heatT<=0){S.heatT=2;A.heat()}}
-if(S.night>=5&&S.evil===0&&S.t>=5*HOUR)evilStart();
+if(S.night>=5&&S.evil===0&&S.t>=5*HOUR&&!(S.cu&&!S.cu.evil))evilStart();
 // scripted event scheduler
-if(S.evil===0&&!S.evBusy&&!S.out){if(S.night>=2){S.t10-=dt;if(S.t10<=0){S.t10=R(80,140)*(S.diff==='easy'?1.4:S.diff==='hard'?.8:1);if(S.t>=S.gate&&!busyAny(MON[S10]))startS10();else S.t10=8}}
+if(S.evil===0&&!S.evBusy&&!S.out){if(S.night>=2&&!(S.cu&&!MON[S10].lv)){S.t10-=dt;if(S.t10<=0){S.t10=R(80,140)*(S.diff==='easy'?1.4:S.diff==='hard'?.8:1);if(S.t>=S.gate&&!busyAny(MON[S10]))startS10();else S.t10=8}}
 if(0){S.tkn-=dt;if(S.tkn<=0){S.tkn=R(70,130)*(S.diff==='easy'?1.4:S.diff==='hard'?.8:1);if(!startKnock())S.tkn=8}}}
 if(S.day){const L=S.dayL===undefined?1:S.dayL;amb.intensity=.45+1.35*L;amb.color.setRGB(.55+.45*L,.5+.46*L,.62+.3*L);scene.fog.density=.004+.03*(1-L)}else if(S.mode!=='free'){amb.color.setHex(0x20202c);scene.fog.density=.04}if(S.mode!=='free'){FREEG.visible=!!S.day;PLUGS.visible=!S.day}if(!S.day&&amb.intensity>.6)amb.intensity=.7;tickAlarm(S.reading||S.day?0:rdt);tickScary(rdt);tickSzEnt(S.reading?0:rdt);tickBase(S.reading?0:rdt);if(S.mode==='play'&&!S.reading&&!S.day){S.fileT=(S.fileT===undefined?R(25,50):S.fileT)-rdt;if(S.fileT<=0){S.fileT=R(50,100);spawnFile()}}questTick(dt);MON.forEach(m=>{tickMon(m,dt*(S.alarm>0?2:1));if(m.walk){m.walk.t+=dt;if(m.walk.t>=m.walk.dur)m.walk=null}if(m.cr){m.cr.t+=dt;if(m.cr.t>=m.cr.dur){if(m.cr.ph===0){m.shown=m.room;m.showSt=m.st;m.cr=(S.cam&&S.camRoom===m.room)?{t:0,dur:3.2,ph:1}:null}else m.cr=null}}});
 S.rotT-=dt;if(S.rotT<=0){S.rotT=R(30,55);if(S.evil===0)rotatePool()}
@@ -2326,7 +2326,7 @@ DT.push(ctex(128,128,(c,W,H)=>{c.clearRect(0,0,W,H);c.fillStyle='rgba(230,225,20
 DT.push(ctex(128,128,(c,W,H)=>{c.clearRect(0,0,W,H);c.strokeStyle='rgba(200,200,200,.35)';c.lineWidth=1;for(let i=0;i<9;i++){c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(i*.18)*120,Math.sin(i*.18)*120);c.stroke()}for(let r=18;r<110;r+=16){c.beginPath();c.arc(0,0,r,0,1.57);c.stroke()}}));
 const DM=DT.map(t=>new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,color:0xbbbbbb}));
 function wallPt(id){const B=ROOMBOX[id];if(!B)return null;const[cx,cz,w,d]=B,wall=Math.floor(Math.random()*4),hh=(HH[id]||3);let x,z,ry;if(wall===0){x=cx+(Math.random()-.5)*(w-3);z=cz-d/2+.13;ry=0}else if(wall===1){x=cx+(Math.random()-.5)*(w-3);z=cz+d/2-.13;ry=PI}else if(wall===2){x=cx-w/2+.13;z=cz+(Math.random()-.5)*(d-3);ry=PI/2}else{x=cx+w/2-.13;z=cz+(Math.random()-.5)*(d-3);ry=-PI/2}return[x,z,ry]}
-Object.keys(HH).forEach(id=>{const n=Math.max(2,Math.round(Object.keys(HH).length&&(ROOMBOX[id][2]*ROOMBOX[id][3])/55));for(let i=0;i<n;i++){const p=wallPt(id);if(!p)continue;const k=Math.floor(Math.random()*DM.length),txt=k>=2&&k<9,w=txt?1.5:.9,h=txt?.4:.9;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),DM[k]);m.position.set(p[0],txt?1.3+Math.random()*1:.9+Math.random()*1.2,p[1]);m.rotation.y=p[2];DEC.add(m)}});
+Object.keys(HH).forEach(id=>{const n=Math.max(2,Math.round(Object.keys(HH).length&&(ROOMBOX[id][2]*ROOMBOX[id][3])/55));for(let i=0;i<n;i++){const p=wallPt(id);if(!p)continue;const K0=[0,1,10,11,12].filter(i=>i<DM.length),k=K0[Math.floor(Math.random()*K0.length)],txt=false,w=txt?1.5:.9,h=txt?.4:.9;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),DM[k]);m.position.set(p[0],txt?1.3+Math.random()*1:.9+Math.random()*1.2,p[1]);m.rotation.y=p[2];DEC.add(m)}});
 Object.keys(HH).forEach(id=>{const n=Math.max(1,Math.round(ROOMBOX[id][2]*ROOMBOX[id][3]/70));for(let i=0;i<n;i++){const p=wallPt(id);if(!p)continue;const k=10+Math.floor(Math.random()*3),m=new THREE.Mesh(new THREE.PlaneGeometry(.9,.9),DM[k]);m.position.set(p[0],k===12?(Math.random()<.5?3:.6):.9+Math.random()*1.2,p[1]);m.rotation.y=p[2];DEC.add(m)}});
 // cobwebs in corners (all rooms + office + under the desk)
 const cwT=ctex(128,128,(c,W,H)=>{c.clearRect(0,0,W,H);c.strokeStyle='rgba(215,215,215,.55)';c.lineWidth=1.1;const N=7;for(let i=0;i<=N;i++){const a=i/N*Math.PI/2;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(a)*125,Math.sin(a)*125);c.stroke()}
@@ -2923,7 +2923,7 @@ function drawV(){if(S.vmode){['map','map2','map3'].forEach(i=>$$(i).style.displa
 vm.addEventListener('click',e=>{const g=e.target.closest('.mv');if(!g)return;const id=g.dataset.id;if(S.camRoom===id)return;S.camRoom=id;glitch(.3);A.blip();syncShown();updMapSel()});
 const oSF=setFloor;setFloor=function(f,keep){if(S.vmode){S.floor=f;[1,2,3].forEach(n=>$$('fl'+n).className=f===n?'on':'');if(!keep&&S.cam&&VF[S.camRoom]!==f){S.camRoom=VLIST[f][0];glitch(.3);A.blip();syncShown();updMapSel();return}drawV();return}oSF.apply(this,arguments);vm.style.display='none'};
 const oUM=updMapSel;updMapSel=function(){if(VID[S.camRoom]&&!S.vmode)S.vmode=true;else if(!VID[S.camRoom]&&S.vmode){S.vmode=false;oSF(S.floor,true)}oUM.apply(this,arguments);drawV();if(VID[S.camRoom])$$('camname').textContent='CAM '+camNum(S.camRoom)+' - '+ROOMS[S.camRoom].n};
-$$('vtg').onclick=()=>{const f=S.floor||1;if(!S.vmode){S.vmode=true;if(S.cam){S.camRoom=VLIST[f][0];glitch(.3);A.blip();syncShown();updMapSel()}else drawV()}else{if(VID[S.camRoom]){S.vmode=false;S.camRoom=f===2?'B1':f===3?'UL':'DA';glitch(.3);A.blip();syncShown();updMapSel()}else{S.vmode=false;oSF(f,true);drawV()}}$$('vtg').blur()};
+$$('vtg').onclick=()=>{const f=S.floor||1;if(!S.vmode){S.vmode=true;if(S.cam){S.camRoom=VLIST[f][0];glitch(.3);A.blip();syncShown();updMapSel()}else drawV()}else{if(VID[S.camRoom]){S.vmode=false;S.camRoom=f===2?'B1':f===3?'UL':'DA';oSF(f,true);glitch(.3);A.blip();syncShown();updMapSel()}else{S.vmode=false;oSF(f,true);drawV()}}$$('vtg').blur()};
 const oGC=gotoCam;gotoCam=function(i){if(S.vmode&&S.mode==='play'&&!S.out){const id=VLIST[S.floor||1][i];if(!id)return;if(!S.cam)toggleCam();if(S.camRoom!==id){S.camRoom=id;glitch(.3);A.blip();syncShown();updMapSel()}return}return oGC.apply(this,arguments)};
 // ---- warning: monsters crawl through the duct before showing up in your vent
 const oAV=arriveVent;arriveVent=function(m,k){if(!m.vgo&&!m.force&&S.mode==='play'&&!S.day&&!m.vp&&!m.nm){m.vp={k,t:0,dur:R(7,10),cam:k==='L'?'VM1':'VM2',w:R(0,6)};m.cd=99;return}return oAV.apply(this,arguments)};
@@ -2962,7 +2962,7 @@ let hazeV=0;
 DIFF.nightmare=DIFF.nightmare||{n:'NIGHTMARE',hour:180,agg:1.5};
 const oSL=setLevels;setLevels=function(){DIFF.nightmare.agg=(S.night===5&&!S.endless)?3:1.5;oSL.apply(this,arguments);if(nmOn())S.gate=Math.max(0,S.gate-HOUR)};
 const oPI=poolInit;poolInit=function(){xtLevels();oPI.apply(this,arguments)};
-function xtLevels(){const D=DIFF[S.diff],ne=nightEff(),nm=nmOn();
+function xtLevels(){if(S.cu)return;const D=DIFF[S.diff],ne=nightEff(),nm=nmOn();
 MON.forEach(m=>{if(!m.xt)return;const allow=ne>=m.nmin&&(!m.nm2||nm);
 if(m.reg)m.lv=allow?Math.max(1,Math.min(20,Math.round(AGG[Math.min(4,ne-1)]*D.agg+(m.bias||0)))):0;else m.lv=allow?1:0});
 const h=MON[3],s=XT.smile;if(h&&s){if(nm){s.lv=h.lv>0?Math.max(1,h.lv):0;h.lv=0}else s.lv=0}}
@@ -2993,11 +2993,11 @@ sprite(m,'full',{x:player.position.x-Math.sin(S.yaw)*d,z:player.position.z-Math.
 
 // ---- per-entity logic
 function xtPre(m,dt){const k=m.xt;
-if(k==='goat')return goatTick(m,dt);
+if(k==='goat'&&!m.xr)return goatTick(m,dt);
 if(k==='svirus')return svTick(m,dt);
 if(k==='chase')return chaseTick(m,dt);
 if(k==='dweller')return dwTick(m,dt);
-if(k==='nstalker'&&m.xr&&act(m)){const x=m.xr;x.t-=dt;x.fs-=dt;if(x.fs<=0){x.fs=.2;try{foot(m.room,1.1)}catch(e){}}if(x.t<=0){m.xr=null;if(slotBusy(m,x.k))retreat(m);else arrive(m,x.k)}return true}
+if((k==='nstalker'||k==='goat')&&m.xr&&act(m)){const x=m.xr;x.t-=dt;x.fs-=dt;if(x.fs<=0){x.fs=.2;try{foot(m.room,1.1)}catch(e){}}if(x.t<=0){m.xr=null;if(slotBusy(m,x.k))retreat(m);else arrive(m,x.k)}return true}
 if(k==='smile'){if(m.st==='vent'){m.vo=(m.vo===undefined?R(3,6):m.vo)-dt;if(m.vo<=0&&!S.heat){const g=m.goalK;m.vo=undefined;if(!MON.some(o=>o!==m&&act(o)&&o.st==='door'&&o.goalK===g)){arrive(m,g);return true}}}else m.vo=undefined}
 return false}
 
@@ -3007,8 +3007,8 @@ m.ev={ph:0,t:0};if(S.cam){m.st='room';m.room=m.shown=S.camRoom;m.showSt='room';m
 function goatKnock(m){if(m.ev||m.xk||S.evBusy||S.mode!=='play'||S.pan10)return false;if(slotBusy(m,'W'))return false;m.off=false;m.lv=Math.max(1,m.lv);m.force=1;
 MON.forEach(o=>{if(o!==m&&o.st!=='room'&&o.goalK==='W')leave(o)});arrive(m,'W');m.jump=false;m.xev='knock';m.xk={t:5,lit:0,ph:0,b:0,kn:0,safe:0};S.evBusy=1;return true}
 function goatTick(m,dt){
-if(!m.xk&&!m.ev){XT.gk-=dt;if(XT.gk<=0){XT.gk=R(70,150)/boost();if(m.lv>0&&Math.random()<.2)goatKnock(m)}
-if(m.st==='room'&&act(m)){const v=S.cam&&S.camRoom===m.room&&m.shown===m.room&&!(S.camDown[m.room]>0);if(v){m.vw=(m.vw||0)+dt;if(m.vw>=2.2&&!m.vroll){m.vroll=1;if(Math.random()<(nmOn()?.5:.3))goatCam(m)}}else{m.vw=0;m.vroll=0}}return false}
+if(!m.xk&&!m.ev){XT.gk-=dt;if(XT.gk<=0){XT.gk=R(70,150)/boost();if(m.lv>0&&Math.random()<.2){if(Math.random()<.5)goatKnock(m);else goatCam(m)}}
+if(m.st==='room'&&act(m)){const v=S.cam&&S.camRoom===m.room&&m.shown===m.room&&!(S.camDown[m.room]>0);if(v){m.vw=(m.vw||0)+dt;if(m.vw>=4&&!m.vroll){m.vroll=1;m.xr={t:1.8,fs:0,k:['L','R','W'][RI(0,2)]};glitch(.4);A.mon(m.idx,0)}}else{m.vw=0;m.vroll=0}}return false}
 if(m.ev){const e=m.ev;e.t+=dt;
 if(e.ph===0){if(m.gz)m.gz.t=e.t;if(e.t>=1.6){m.gz=null;e.ph=1;e.t=0}return true}
 if(e.ph===1){Object.keys(ROOMS).forEach(id=>{S.camDown[id]=14});glitch(1.6);A.noise(1.2,.5,{type:'highpass',f:900});if(S.cam)toggleCam(true);S.pan10='L';
@@ -3030,7 +3030,7 @@ if(slotBusy(m,'W'))retreat(m);else{arrive(m,'W');m.imm=true;m.at=.45;m.jump=fals
 if(m.imm&&m.st==='window'){m.wt+=dt;m.br=9;m.at-=dt;if(m.at<=0){m.imm=false;if(S.shut)repel(m);else kill(m)}return true}
 if(m.imm)m.imm=false;
 if(m.st==='room'&&act(m)){const v=S.cam&&S.camRoom===m.room&&m.shown===m.room&&!(S.camDown[m.room]>0);if(v)m.sv+=dt;else m.sv=0;
-if(m.armed&&m.sv>2){m.jmp={ph:0,t:0};m.sv=0;A.mon(m.idx,0)}}
+if(m.sv>3){m.jmp={ph:0,t:0};m.sv=0;A.mon(m.idx,0)}}
 return false}
 
 // chaser (behind the player)
@@ -3081,14 +3081,130 @@ $('diff').onclick=()=>{const k=Object.keys(DIFF);S.diff=k[(k.indexOf(S.diff)+1)%
 // ---- test panel
 const tp=document.getElementById('tp'),sel=document.getElementById('tm');
 if(sel)MON.forEach((m,i)=>{if(m.xt)sel.add(new Option((i+1)+'. '+NAMES[i],i))});
-if(tp){const d=document.createElement('div');d.innerHTML='<h3>NEW ENTITIES</h3><button id="xg1">GOAT: CAMERA STARE EVENT</button><button id="xg2">GOAT: WINDOW KNOCK EVENT</button><button id="xg3">STALKER VIRUS: ARM (STARE 2S ON CAM)</button><button id="xg4">CHASER: SPAWN BEHIND YOU</button><button id="xg5">CAVE DWELLER: SPAWN NOW</button>';tp.appendChild(d);
+if(tp){const d=document.createElement('div');d.innerHTML='<h3>NEW ENTITIES</h3><button id="xg1">GOAT: CAMERA STARE EVENT</button><button id="xg2">SCRIPTED: GOAT STALKER AT WINDOW</button><button id="xg3">STALKER VIRUS: SUMMON ON CAM (STARE 3S)</button><button id="xg4">CHASER: SPAWN BEHIND YOU</button><button id="xg5">CAVE DWELLER: SPAWN NOW</button>';tp.appendChild(d);
 const g=id=>document.getElementById(id),pl=()=>{if(S.mode!=='play'){toast('START A NIGHT FIRST');return false}return true};
 g('xg1').onclick=()=>{if(!pl())return;const m=XT.goat;S.evBusy=0;S.pan10=null;toast(goatCam(m)?'GOAT CAM EVENT':'BUSY')};
-g('xg2').onclick=()=>{if(!pl())return;const m=XT.goat;S.evBusy=0;toast(goatKnock(m)?'GOAT KNOCKING':'BUSY')};
+g('xg2').onclick=()=>{if(!pl())return;const m=XT.goat;S.evBusy=0;S.pan10=null;S.atkCD=0;m.ev=m.xk=null;m.gz=null;MON.forEach(o=>{if(o!==m&&o.st!=='room')leave(o)});if(m.st!=='room')leave(m);toast(goatKnock(m)?'GOAT AT WINDOW: LIGHT ON, THEN SHUTTERS':'BUSY')};
 g('xg3').onclick=()=>{if(!pl())return;const m=XT.svirus;m.lv=Math.max(1,m.lv);m.off=false;m.force=1;m.walk=null;m.st='room';m.room=m.shown=S.cam?S.camRoom:'DA';m.showSt='room';m.armed=true;m.sv=0;toast('OPEN CAM ON '+ROOMS[m.room].n)};
 g('xg4').onclick=()=>{if(!pl())return;const m=XT.chase;m.force=1;toast('LOOK BEHIND: DOWN ARROW')};
 g('xg5').onclick=()=>{if(!pl())return;const m=XT.dweller;m.force=1;m.dwOn=false;m.room=dkPick();toast('DWELLER SPAWNED')}}
 xtReset();
+})();
+</script>
+<script>
+// ================= v62: evil hunt, lore, 100% unlock, ultimate custom night, codes, checks =================
+(function(){
+const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+const $$=id=>document.getElementById(id);
+const toast=t=>{const e=$$('tst');if(e){e.textContent=t;setTimeout(()=>{if(e.textContent===t)e.textContent=''},2500)}};
+
+// ---- more lore
+LORE.push(
+['MEMO - M. DAVIDS','TO: SUBZERO\nFROM: MIKE DAVIDS, ACCOUNTING\nTHE PIZZA PARLOR LOST MONEY EVERY MONTH OF 1987. I CAN HIDE IT FOR ONE MORE QUARTER, NOT TWO. YOU KEEP TELLING ME THE BASEMENT WILL "PAY FOR ITSELF." THE BASEMENT HAS NEVER SOLD A SINGLE TICKET.\nI SIGNED THE CHECKS. I DID NOT ASK WHERE THE KIDS WENT. I SHOULD HAVE ASKED.'],
+['LETTER FROM M. DAVIDS','SUB,\nI AM LEAVING THE BOOKS WITH YOU. EVERY NIGHT GUARD YOU HIRE SIGNS FOR SIX HOURS AND IS NEVER PAID, BECAUSE NOBODY EVER COLLECTS A CHECK. I KEPT THEIR PAYCHECKS IN THE DRAWER. IF ANYONE EVER SURVIVES THE WEEK, GIVE THEM EVERYTHING IN IT.\n- MIKE'],
+['MAINTENANCE LOG - GOAT','LOG ENTRY: SOMETHING IS IN THE DUCT ABOVE THE OFFICE. IT KNOCKS WHEN I TURN MY BACK. TODAY I SAW HORNS IN THE VENT COVER, THEN A FACE PRESSED FLAT TO THE GLASS FROM OUTSIDE.\nIT WAS TALLER THAN THE WINDOW. THE WINDOW IS ELEVEN FEET OFF THE GROUND.\nI SHUT THE SHUTTERS AND COUNTED. IT LEFT AFTER A WHILE. DO NOT OPEN THEM EARLY.'],
+['SECURITY TAPE - 3:12 AM','THE CAMERAS ALL TURN OFF AT ONCE, EVERY TIME. THE LAST FRAME ALWAYS SHOWS THE SAME THING: A TALL SHAPE LOOKING INTO THE LENS.\nTHE GUARD WROTE: "MY MONITOR TILTED TOWARD THE LEFT DOOR ON ITS OWN. I HAD FIVE SECONDS. I USED THEM."\nHE IS THE ONLY GUARD WHO WROTE ANYTHING AFTER THAT.'],
+['NOTE - THE VIRUS','THEY CALL IT THE VIRUS BECAUSE IT SPREADS. EVERY ONE THAT SUB BUILT HAS A COPY SOMEWHERE ELSE NOW. THE COPIES ARE WRONG: TALLER, HUNGRIER, AND THEY DO NOT WAIT AT THE DOOR.\nIF ONE OF THEM STARES BACK AT YOU THROUGH THE CAMERA, LOOK AWAY BEFORE IT DECIDES.'],
+['DIARY - PAGE 30','I FOUND OUT WHY THE DARK PARTS OF THE BUILDING FEEL WARMER. SOMETHING LIVES THERE. IT HATES THE FLASHLIGHT, IT WILL NOT COME NEAR IT, BUT IT KEEPS WALKING TOWARD THE OFFICE ONE ROOM AT A TIME WHILE YOU WATCH.\nSO I STOPPED WATCHING IT. THEN IT WALKED FASTER.'],
+['WORKER\'S NOTE - BEHIND YOU','NEW GUARD TIP: IF THE AIR TURNS PURPLE AND THE ROOM GOES HEAVY, DO NOT KEEP LOOKING AT THE MONITOR. IT IS STANDING RIGHT BEHIND YOUR CHAIR. TURN AROUND AND LOOK AT IT. IT CANNOT STAND BEING SEEN.'],
+['LAST CHECK - UNSENT','A CHECK MADE OUT TO "THE LAST GUARD", SIGNED MIKE DAVIDS, FOR MORE MONEY THAN ANY GUARD HAS EVER BEEN OFFERED.\nSTAPLED TO IT: "IF YOU READ THIS, YOU DID WHAT NO ONE ELSE DID. I AM SORRY ABOUT ALL OF THEM."'],
+['SUB\'S CONFESSION','I DID NOT MEAN FOR THEM TO STAY. I BUILT THEM TO WALK THE HALLS AND SCARE THE KIDS INTO BUYING MORE TICKETS. THEN THE CHILDREN WENT DOWN THE STAIRS AND THE DOOR WOULD NOT OPEN, AND THE MACHINES SAID THEY HAD BEEN GIVEN A NEW JOB.\nEVERY NIGHT I TELL MYSELF I WILL STOP THEM. EVERY NIGHT I HIRE ANOTHER GUARD.'],
+['THE LAST PAGE','WHOEVER YOU ARE: YOU HAVE READ EVERYTHING. NOW YOU KNOW WHY THE HALLWAYS ARE LONG, AND WHY THE BUILDING WANTS YOU TO FEEL ALONE.\nYOU ARE NOT THE FIRST. YOU CAN BE THE LAST.']);
+updBinder();
+
+// ---- run tracking for the 100% unlock
+const REQ=[0,1,2,3,4,5,6,8,9,10];
+const run=()=>{try{return JSON.parse(LS('stn_run')||'{"d":0,"r":[]}')}catch(e){return{d:0,r:[]}}},saveRun=r=>LS('stn_run',JSON.stringify(r));
+const oLv=leave;leave=function(m){try{if(m&&m.st!=='room'&&S.mode==='play'&&!S.endless&&!S.cu&&REQ.includes(m.idx)){const r=run();if(!r.r.includes(m.idx)){r.r.push(m.idx);saveRun(r)}}}catch(e){}return oLv.apply(this,arguments)};
+const oGO=gameOverSeq;gameOverSeq=function(){try{if(!S.endless&&!S.cu&&!S.free&&!S.freeRetry){const r=run();r.d++;saveRun(r)}}catch(e){}return oGO.apply(this,arguments)};
+$$('start').addEventListener('click',()=>saveRun({d:0,r:[]}));
+const CHK0=$$('chk').innerHTML;
+const oWin=win;win=function(){const wasNew=LS('stn_ucn')!=='1';$$('chk').innerHTML=CHK0;oWin.apply(this,arguments);
+if(S.cu){$$('chk').innerHTML=CHK0.replace('<b>SUBZERO</b>',"<b>MIKE DAVID'S</b>").replace('No. 1989','No. 2120').replace('$100.00','$120.00').replace('ONE HUNDRED AND 00/100','ONE HUNDRED TWENTY AND 00/100').replace('memo: night shift','memo: ultimate custom night').replace('<em>Subzero</em>',"<em>Mike David's</em>");$$('chk').style.display='block';$$('wt').innerHTML='CUSTOM NIGHT COMPLETE';S.mode='cwin';setTimeout(()=>{if(S.mode==='cwin'){$$('win').className='ov';S.cu&&toMenu()}},9000);return}
+if(!S.endless&&S.night>=5){const r=run();if(r.d===0&&REQ.every(i=>r.r.includes(i))&&found.length>=LORE.length){LS('stn_ucn','1');if(wasNew)$$('wt').innerHTML+='<br><span style="font-size:12px;color:#f33">ULTIMATE CUSTOM NIGHT UNLOCKED</span>'}}};
+
+// ---- evil hunt: cameras vanish, "RUN"
+const gone={};let goneT=3;
+const runEl=document.createElement('div');runEl.style.cssText='position:fixed;inset:0;z-index:11;background:#000;display:none;align-items:center;justify-content:center;font:900 min(24vw,230px) PS2P,monospace;color:#e00;letter-spacing:.05em';runEl.textContent='RUN';document.body.appendChild(runEl);
+const oEG=evilGo;evilGo=function(){Object.keys(gone).forEach(k=>delete gone[k]);goneT=3;oEG.apply(this,arguments)};
+const oRN=resetNight;resetNight=function(){Object.keys(gone).forEach(k=>delete gone[k]);oRN.apply(this,arguments)};
+const oUM=updMapSel;updMapSel=function(){oUM.apply(this,arguments);document.querySelectorAll('.mb,.mv').forEach(g=>{g.style.opacity=gone[g.dataset.id]?'.18':'1'})};
+let lastT=performance.now();setInterval(()=>{const nw=performance.now(),dtI=Math.min(2,(nw-lastT)/1000);lastT=nw;const hunt=S.mode==='play'&&S.evil===2;
+if(hunt){goneT-=dtI;if(goneT<=0){goneT=R(2.5,4);const l=Object.keys(ROOMS).filter(k=>!gone[k]);if(l.length){gone[l[RI(0,l.length-1)]]=1;updMapSel()}}}
+else if(S.evil!==2&&Object.keys(gone).length&&S.mode!=='dying'&&S.mode!=='dead'){Object.keys(gone).forEach(k=>delete gone[k]);updMapSel()}
+runEl.style.display=(hunt&&S.cam&&gone[S.camRoom])?'flex':'none'},200);
+
+// evil: taller in doorways (and window works via tickEvil patch)
+const oSp=sprite;sprite=function(m,t,o){if(m.evil&&!m.xt){const sv=CEILH[m.room];CEILH[m.room]=4.3;try{return oSp(m,t,o)}finally{CEILH[m.room]=sv}}return oSp(m,t,o)};
+const oPD=placeDoor;placeDoor=function(m,r,c){if(m.evil&&!m.xt){const s=r==='WH'?-1:1,v=getVar(m,'full'),sc=Math.min(4.3/(m.h*v.fh),3.6/(m.h*m.asp*v.fw));sprite(m,'full',{x:s*6.6,z:-5.2,bottom:0,sc,c});return}return oPD(m,r,c)};
+
+// ================= ULTIMATE CUSTOM NIGHT =================
+const N=MON.length,HRS=[...Array(29)].map((_,i)=>20+i*10);
+const defU=()=>({hour:90,start:0,power:100,atk:0,angry:0,evil:1,all:0,nm:0,ai:MON.map(m=>m.evil?0:6),ap:MON.map(()=>0)});
+let U=defU();
+function enc(u){const rad=[29,11,11,16,2,2,2,2],val=[Math.round((u.hour-20)/10),Math.round(u.start*2),Math.round((u.power-50)/25),u.atk,u.angry?1:0,u.evil?1:0,u.all?1:0,u.nm?1:0];
+for(let i=0;i<N;i++){rad.push(21);val.push(u.ai[i])}for(let i=0;i<N;i++){rad.push(6);val.push(u.ap[i])}
+let v=0n;rad.forEach((r,i)=>{v=v*BigInt(r)+BigInt(val[i])});let s=v.toString(36).toUpperCase().padStart(46,'0'),ck=0;for(const ch of s)ck=(ck*31+parseInt(ch,36))%1296;
+return'UCN-'+s.match(/.{1,6}/g).join('-')+'-'+ck.toString(36).toUpperCase().padStart(2,'0')}
+function dec(code){try{let c=code.toUpperCase().replace(/\s/g,'');if(!/^UCN-/.test(c))return null;const parts=c.slice(4).split('-'),ckS=parts.pop(),s=parts.join('');let ck=0;for(const ch of s)ck=(ck*31+parseInt(ch,36))%1296;if(ck.toString(36).toUpperCase().padStart(2,'0')!==ckS)return null;
+let v=0n;for(const ch of s)v=v*36n+BigInt(parseInt(ch,36));const rad=[29,11,11,16,2,2,2,2];for(let i=0;i<N;i++)rad.push(21);for(let i=0;i<N;i++)rad.push(6);
+const val=[];for(let i=rad.length-1;i>=0;i--){const r=BigInt(rad[i]);val[i]=Number(v%r);v/=r}if(v!==0n)return null;
+return{hour:20+val[0]*10,start:val[1]/2,power:50+val[2]*25,atk:val[3],angry:val[4],evil:val[5],all:val[6],nm:val[7],ai:val.slice(8,8+N),ap:val.slice(8+N,8+2*N)}}catch(e){return null}}
+window.UCNcode={enc,dec};
+
+const st=document.createElement('style');st.textContent='#ucn{background:#000;z-index:60;justify-content:flex-start;overflow:auto;padding:16px;font:10px PS2P,monospace;color:#fff;align-items:stretch}#ucn h2{font-size:18px;color:#e22;margin:6px 0 10px}#ucn .row{display:flex;align-items:center;gap:8px;margin:5px 0;text-align:left}#ucn .row b{width:150px;font-weight:normal;flex:none}#ucn input[type=range]{flex:1;min-width:80px}#ucn .v{width:48px;text-align:right;color:#ff0}#ucn select,#ucn textarea{font:9px PS2P,monospace;background:#000;color:#fff;border:2px solid #fff;padding:4px}#ucn textarea{width:100%;height:70px;resize:none;color:#0f0}#ucn .bt{margin:6px 0;padding:10px}#ucn h3{color:#aaa;font-size:11px;margin:14px 0 4px;text-align:left}#ucn p{color:#888;font-size:8px;line-height:1.8;text-align:left}#codebox{display:flex;gap:4px;flex-wrap:wrap}#codein{flex:1;min-width:0;font:9px PS2P,monospace;background:#000;color:#fff;border:2px solid #fff;padding:7px}#codego{padding:7px 10px}#codemsg{width:100%;font-size:8px;color:#ff0;min-height:10px;text-align:left}#mprog{font-size:7px;color:#666;line-height:1.8;text-align:left;margin-top:6px}';document.head.appendChild(st);
+const ov=document.createElement('div');ov.id='ucn';ov.className='ov';document.body.appendChild(ov);
+function sync(){ov.querySelectorAll('[data-k]').forEach(e=>{const k=e.dataset.k;if(e.type==='checkbox')e.checked=!!U[k];else e.value=U[k];const lab=ov.querySelector('[data-v="'+k+'"]');if(lab)lab.textContent=k==='atk'&&!U.atk?'AUTO':U[k]+(k==='power'?'%':k==='hour'?'S':k==='start'?'H':'')});
+ov.querySelectorAll('[data-ai]').forEach(e=>{e.value=U.ai[e.dataset.ai];ov.querySelector('[data-aiv="'+e.dataset.ai+'"]').textContent=U.ai[e.dataset.ai]});ov.querySelectorAll('[data-ap]').forEach(e=>{e.value=U.ap[e.dataset.ap]})}
+function buildU(){let h='<h2>ULTIMATE CUSTOM NIGHT</h2><h3>NIGHT SETTINGS</h3>';
+const rg=(k,l,min,max,step)=>'<div class="row"><b>'+l+'</b><input type="range" data-k="'+k+'" min="'+min+'" max="'+max+'" step="'+step+'"><span class="v" data-v="'+k+'"></span></div>',cb=(k,l)=>'<div class="row"><b style="width:auto"><label><input type="checkbox" data-k="'+k+'"> '+l+'</label></b></div>';
+h+=rg('hour','HOUR LENGTH (SEC)',20,300,10)+rg('start','MONSTERS START AT HOUR',0,5,.5)+rg('power','POWER',50,300,25)+rg('atk','DOOR TIMER (0=AUTO)',0,15,1)+cb('angry','ALL MONSTERS ANGRY')+cb('evil','EVIL STALKER 5 AM HUNT')+cb('all','ALL ACTIVE AT ONCE (NO ROTATION)')+cb('nm','NIGHTMARE MODE RULES (2X ON NIGHT 5 STYLE AI)');
+h+='<h3>MONSTER AI (0 = OFF, 20 = MAX) AND APPEAR HOUR</h3><div class="row"><b>ALL MONSTERS</b><input type="range" id="uall" min="0" max="20" step="1" value="6"><span class="v" id="ualv">6</span></div>';
+MON.forEach((m,i)=>{if(m.evil)return;h+='<div class="row"><b>'+NAMES[i].slice(0,14)+'</b><input type="range" data-ai="'+i+'" min="0" max="20" step="1"><span class="v" data-aiv="'+i+'"></span><select data-ap="'+i+'">'+[0,1,2,3,4,5].map(x=>'<option value="'+x+'">'+(x?x+' AM':'12 AM')+'</option>').join('')+'</select></div>'});
+h+='<h3>SHARE</h3><button class="bt" id="ugen">GEN CODE</button><p>GENERATE A CODE FOR YOUR FRIENDS TO PLAY YOUR CUSTOM NIGHT SETTINGS. THEY TYPE IT INTO THE CODE BOX AT THE TOP OF THE MENU.</p><textarea id="ucode" readonly placeholder="YOUR CODE APPEARS HERE"></textarea><button class="bt" id="ucopy">COPY</button><button class="bt" id="ustart" style="color:#f33;border-color:#f33">START CUSTOM NIGHT</button><button class="bt" id="ureset">RESET SETTINGS</button><button class="bt" id="uback">BACK</button>';
+ov.innerHTML=h;
+ov.oninput=ov.onchange=e=>{const t=e.target;if(t.dataset.k){const k=t.dataset.k;U[k]=t.type==='checkbox'?(t.checked?1:0):+t.value;sync()}else if(t.dataset.ai!==undefined){U.ai[+t.dataset.ai]=+t.value;sync()}else if(t.dataset.ap!==undefined)U.ap[+t.dataset.ap]=+t.value;else if(t.id==='uall'){U.ai=U.ai.map((a,i)=>MON[i].evil?0:+t.value);$$('ualv').textContent=t.value;sync()}};
+$$('ugen').onclick=()=>{$$('ucode').value=enc(U)};$$('ucopy').onclick=()=>{const t=$$('ucode');if(!t.value)t.value=enc(U);t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}};
+$$('ureset').onclick=()=>{U=defU();sync()};$$('uback').onclick=()=>{ov.className='ov';toMenu()};$$('ustart').onclick=startU;sync()}
+function openU(){hideAll();S.mode='menu';$$('menu').className='ov';if(!ov.firstChild)buildU();sync();ov.className='ov show';ov.style.display='flex';ov.scrollTop=0}
+const hideU=()=>{ov.className='ov';ov.style.display=''};
+function startU(){hideU();S.cuPrev=S.cuPrev||S.diff;S.cu=JSON.parse(JSON.stringify(U));S.endless=false;S.free=false;S.freeRetry=false;S.night=5;S.diff=U.nm?'nightmare':'normal';TEST.atk=U.atk;TEST.angry=!!U.angry;startNight()}
+const oSL2=setLevels;setLevels=function(){oSL2.apply(this,arguments);if(S.cu)S.gate=S.cu.start*HOUR};
+function applyLv(){const u=S.cu;MON.forEach((m,i)=>{const a=u.ai[i];m._ap=0;if(m.evil)m.lv=u.evil?1:0;else if(m.scr==='s10'||m.scr==='knock')m.lv=a>0?1:0;else m.lv=a})}
+const oPI2=poolInit;poolInit=function(){if(S.cu)applyLv();oPI2.apply(this,arguments);if(S.cu&&S.cu.all)REG().forEach(m=>{m.off=false})};
+const oRN2=resetNight;resetNight=function(){if(S.cu){const D=DIFF[S.diff],h=D.hour;D.hour=S.cu.hour;try{oRN2.apply(this,arguments)}finally{D.hour=h}START=Math.round(START*S.cu.power/100);S.power=START}else oRN2.apply(this,arguments)};
+const oTM3=tickMon;tickMon=function(m,dt){if(S.cu&&S.mode==='play'){const ap=S.cu.ap[m.idx];if(ap>0&&S.t<ap*HOUR){m.off=true;m.mesh.visible=false;return}if(ap>0&&!m._ap){m._ap=1;m.off=false}}return oTM3(m,dt)};
+const oTMn=toMenu;toMenu=function(){if(S.cu){S.cu=null;if(S.cuPrev){S.diff=S.cuPrev;S.cuPrev=null}TEST.atk=0;TEST.angry=false}hideU();oTMn.apply(this,arguments);menuX()};
+$$('tomenu').onclick=()=>toMenu();
+
+// ---- menu: code box, custom night button, progress
+const side=$$('mside');
+const cbx=document.createElement('div');cbx.id='codebox';cbx.innerHTML='<input id="codein" maxlength="120" placeholder="ENTER CODE" autocomplete="off" spellcheck="false"><button class="bt" id="codego">GO</button><div id="codemsg"></div>';side.insertBefore(cbx,side.firstChild);
+const ub=document.createElement('button');ub.className='bt';ub.id='ucnb';ub.style.display='none';ub.textContent='ULTIMATE CUSTOM NIGHT';side.insertBefore(ub,$$('reset'));
+const pg=document.createElement('p');pg.id='mprog';side.appendChild(pg);
+ub.onclick=openU;
+function menuX(){const un=LS('stn_ucn')==='1';ub.style.display=un?'block':'none';const r=run();pg.innerHTML='100%: DEATHS '+r.d+' | SENT AWAY '+r.r.length+'/'+REQ.length+' | FILES '+found.length+'/'+LORE.length+(un?'<br>CUSTOM NIGHT UNLOCKED':'')}
+const say=t=>{$$('codemsg').textContent=t;setTimeout(()=>{if($$('codemsg').textContent===t)$$('codemsg').textContent=''},3000)};
+function go(){const raw=$$('codein').value.trim();$$('codein').value='';if(!raw)return;const c=raw.toUpperCase().replace(/\s/g,'');
+if(/^UCN-/.test(c)){const u=dec(c);if(!u){say('BAD CODE');return}U=u;openU();return}
+const m=c.match(/^NIGHT([1-5])$/);if(m){S.cu=null;S.endless=false;S.night=+m[1];saved=Math.max(saved,S.night);startNight();return}
+if(c==='UNKNOWN'){S.endless=true;S.night=3;startDay();return}
+if(c==='EXTRAS'){hideAll();S.mode='menu';$$('extra').className='ov show';return}
+if(c==='CUSTOM'||c==='ULTIMATE'){openU();return}
+if(c==='BINDER'){$$('mbind').click();return}
+say('UNKNOWN CODE')}
+$$('codego').onclick=go;$$('codein').addEventListener('keydown',e=>{e.stopPropagation();if(e.code==='Enter')go()});$$('codein').addEventListener('keyup',e=>e.stopPropagation());
+menuX();
+
+// ---- blood-splattered check after forgiving him
+const cssT=[...document.styleSheets].flatMap(s=>{try{return[...s.cssRules]}catch(e){return[]}}).filter(r=>r.selectorText&&/#chk/.test(r.selectorText)).map(r=>r.cssText.replace(/#chk/g,'#bchk')).join('');
+const bs=document.createElement('style');bs.textContent=cssT+'#bwrap{position:fixed;inset:0;z-index:95;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;font:10px PS2P,monospace;color:#fff;text-align:center}#bchk{display:block!important;overflow:hidden}#bchk:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 30%,#7a0000 0 16px,transparent 17px),radial-gradient(circle at 75% 20%,#8a0000 0 24px,transparent 25px),radial-gradient(circle at 60% 70%,#650000 0 30px,transparent 31px),radial-gradient(circle at 30% 80%,#8a0000 0 12px,transparent 13px),radial-gradient(circle at 90% 85%,#7a0000 0 18px,transparent 19px),linear-gradient(90deg,transparent 22%,#7a0000 22% 23%,transparent 23% 64%,#6a0000 64% 65.5%,transparent 65.5%),linear-gradient(180deg,transparent 40%,rgba(120,0,0,.35))}';document.head.appendChild(bs);
+const bw=document.createElement('div');bw.id='bwrap';bw.innerHTML='<h2 style="font-size:16px;margin-bottom:14px">HE LEFT SOMETHING FOR YOU</h2>'+'<div id="bchk">'+CHK0.replace('<b>SUBZERO</b>','<b>SUBZERO</b>').replace('No. 1989','No. 0000').replace('$100.00','$200.00').replace('ONE HUNDRED AND 00/100','TWO HUNDRED AND 00/100').replace('memo: night shift','memo: thank you for forgiving me')+'</div><button class="bt" id="bchkx" style="margin-top:20px">TAKE IT</button>';document.body.appendChild(bw);
+$$('bchkx').onclick=()=>{bw.style.display='none'};
+const oFy=$$('fyes').onclick;$$('fyes').onclick=()=>{oFy();bw.style.display='flex'};
+
+// ---- test panel: unlock + reliable goat window event
+const tp=$$('tp');if(tp){const d=document.createElement('div');d.innerHTML='<h3>PROGRESS</h3><button id="xun">UNLOCK ULTIMATE CUSTOM NIGHT</button>';tp.insertBefore(d,tp.firstChild.nextSibling||null);$$('xun').onclick=()=>{LS('stn_ucn','1');menuX();toast('CUSTOM NIGHT UNLOCKED')}}
 })();
 </script>
 </body></html>
