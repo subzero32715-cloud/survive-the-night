@@ -3162,13 +3162,13 @@ h+=rg('hour','HOUR LENGTH (SEC)',20,300,10)+rg('start','MONSTERS START AT HOUR',
 h+='<h3>MONSTER AI (0 = OFF, 20 = MAX) AND APPEAR HOUR</h3><div class="row"><b>ALL MONSTERS</b><input type="range" id="uall" min="0" max="20" step="1" value="6"><span class="v" id="ualv">6</span></div>';
 MON.forEach((m,i)=>{if(m.evil)return;h+='<div class="row"><b>'+NAMES[i].slice(0,14)+'</b><input type="range" data-ai="'+i+'" min="0" max="20" step="1"><span class="v" data-aiv="'+i+'"></span><select data-ap="'+i+'">'+[0,1,2,3,4,5].map(x=>'<option value="'+x+'">'+(x?x+' AM':'12 AM')+'</option>').join('')+'</select></div>'});
 h+='<h3>SHARE</h3><button class="bt" id="ugen">GEN CODE</button><p>GENERATE A CODE FOR YOUR FRIENDS TO PLAY YOUR CUSTOM NIGHT SETTINGS. THEY TYPE IT INTO THE CODE BOX AT THE TOP OF THE MENU.</p><textarea id="ucode" readonly placeholder="YOUR CODE APPEARS HERE"></textarea><button class="bt" id="ucopy">COPY</button><button class="bt" id="ustart" style="color:#f33;border-color:#f33">START CUSTOM NIGHT</button><button class="bt" id="ureset">RESET SETTINGS</button><button class="bt" id="uback">BACK</button>';
-ov.innerHTML=h;
+ov.innerHTML=h;ov.insertBefore(cbx,ov.children[1]);
 ov.oninput=ov.onchange=e=>{const t=e.target;if(t.dataset.k){const k=t.dataset.k;U[k]=t.type==='checkbox'?(t.checked?1:0):+t.value;sync()}else if(t.dataset.ai!==undefined){U.ai[+t.dataset.ai]=+t.value;sync()}else if(t.dataset.ap!==undefined)U.ap[+t.dataset.ap]=+t.value;else if(t.id==='uall'){U.ai=U.ai.map((a,i)=>MON[i].evil?0:+t.value);$$('ualv').textContent=t.value;sync()}};
 $$('ugen').onclick=()=>{$$('ucode').value=enc(U)};$$('ucopy').onclick=()=>{const t=$$('ucode');if(!t.value)t.value=enc(U);t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}};
 $$('ureset').onclick=()=>{U=defU();sync()};$$('uback').onclick=()=>{ov.className='ov';toMenu()};$$('ustart').onclick=startU;sync()}
 function openU(){hideAll();S.mode='menu';$$('menu').className='ov';if(!ov.firstChild)buildU();sync();ov.className='ov show';ov.style.display='flex';ov.scrollTop=0}
 const hideU=()=>{ov.className='ov';ov.style.display=''};
-function startU(){hideU();S.cuPrev=S.cuPrev||S.diff;S.cu=JSON.parse(JSON.stringify(U));S.endless=false;S.free=false;S.freeRetry=false;S.night=5;S.diff=U.nm?'nightmare':'normal';TEST.atk=U.atk;TEST.angry=!!U.angry;startNight()}
+function startU(){if(LS('stn_ucn')!=='1'&&!S.viaCode){say('LOCKED: 100% ALL 5 NIGHTS, OR ENTER A FRIENDS CODE');return}hideU();S.cuPrev=S.cuPrev||S.diff;S.cu=JSON.parse(JSON.stringify(U));S.endless=false;S.free=false;S.freeRetry=false;S.night=5;S.diff=U.nm?'nightmare':'normal';TEST.atk=U.atk;TEST.angry=!!U.angry;startNight()}
 const oSL2=setLevels;setLevels=function(){oSL2.apply(this,arguments);if(S.cu)S.gate=S.cu.start*HOUR};
 function applyLv(){const u=S.cu;MON.forEach((m,i)=>{const a=u.ai[i];m._ap=0;if(m.evil)m.lv=u.evil?1:0;else if(m.scr==='s10'||m.scr==='knock')m.lv=a>0?1:0;else m.lv=a})}
 const oPI2=poolInit;poolInit=function(){if(S.cu)applyLv();oPI2.apply(this,arguments);if(S.cu&&S.cu.all)REG().forEach(m=>{m.off=false})};
@@ -3179,21 +3179,21 @@ $$('tomenu').onclick=()=>toMenu();
 
 // ---- menu: code box, custom night button, progress
 const side=$$('mside');
-const cbx=document.createElement('div');cbx.id='codebox';cbx.innerHTML='<input id="codein" maxlength="120" placeholder="ENTER CODE" autocomplete="off" spellcheck="false"><button class="bt" id="codego">GO</button><div id="codemsg"></div>';side.insertBefore(cbx,side.firstChild);
+const cbx=document.createElement('div');cbx.id='codebox';cbx.innerHTML='<input id="codein" maxlength="120" placeholder="ENTER CODE" autocomplete="off" spellcheck="false"><button class="bt" id="codego">GO</button><div id="codemsg"></div>';
 const ub=document.createElement('button');ub.className='bt';ub.id='ucnb';ub.style.display='none';ub.textContent='ULTIMATE CUSTOM NIGHT';side.insertBefore(ub,$$('reset'));
 const pg=document.createElement('p');pg.id='mprog';side.appendChild(pg);
-ub.onclick=openU;
-function menuX(){const un=LS('stn_ucn')==='1';ub.style.display=un?'block':'none';const r=run();pg.innerHTML='100%: DEATHS '+r.d+' | SENT AWAY '+r.r.length+'/'+REQ.length+' | FILES '+found.length+'/'+LORE.length+(un?'<br>CUSTOM NIGHT UNLOCKED':'')}
-const say=t=>{$$('codemsg').textContent=t;setTimeout(()=>{if($$('codemsg').textContent===t)$$('codemsg').textContent=''},3000)};
-function go(){const raw=$$('codein').value.trim();$$('codein').value='';if(!raw)return;const c=raw.toUpperCase().replace(/\s/g,'');
-if(/^UCN-/.test(c)){const u=dec(c);if(!u){say('BAD CODE');return}U=u;openU();return}
+ub.onclick=()=>{S.viaCode=0;openU()};
+function menuX(){const un=LS('stn_ucn')==='1';ub.style.display='block';ub.textContent=un?'ULTIMATE CUSTOM NIGHT':'ULTIMATE CUSTOM NIGHT (LOCKED)';const r=run();pg.innerHTML='100%: DEATHS '+r.d+' | SENT AWAY '+r.r.length+'/'+REQ.length+' | FILES '+found.length+'/'+LORE.length+(un?'<br>CUSTOM NIGHT UNLOCKED':'')}
+const say=t=>{const e=cbx.querySelector('#codemsg');e.textContent=t;setTimeout(()=>{if(e.textContent===t)e.textContent=''},3000)};
+function go(){const ci=cbx.querySelector('#codein'),raw=ci.value.trim();ci.value='';if(!raw)return;const c=raw.toUpperCase().replace(/\s/g,'');
+if(/^UCN-/.test(c)){const u=dec(c);if(!u){say('BAD CODE');return}U=u;S.viaCode=1;openU();return}
 const m=c.match(/^NIGHT([1-5])$/);if(m){S.cu=null;S.endless=false;S.night=+m[1];saved=Math.max(saved,S.night);startNight();return}
 if(c==='UNKNOWN'){S.endless=true;S.night=3;startDay();return}
 if(c==='EXTRAS'){hideAll();S.mode='menu';$$('extra').className='ov show';return}
 if(c==='CUSTOM'||c==='ULTIMATE'){openU();return}
 if(c==='BINDER'){$$('mbind').click();return}
-say('UNKNOWN CODE')}
-$$('codego').onclick=go;$$('codein').addEventListener('keydown',e=>{e.stopPropagation();if(e.code==='Enter')go()});$$('codein').addEventListener('keyup',e=>e.stopPropagation());
+openU();say('UNKNOWN CODE')}
+cbx.querySelector('#codego').onclick=go;const cin=cbx.querySelector('#codein');cin.addEventListener('keydown',e=>{e.stopPropagation();if(e.code==='Enter')go()});cin.addEventListener('keyup',e=>e.stopPropagation());
 menuX();
 
 // ---- blood-splattered check after forgiving him
@@ -3205,6 +3205,109 @@ const oFy=$$('fyes').onclick;$$('fyes').onclick=()=>{oFy();bw.style.display='fle
 
 // ---- test panel: unlock + reliable goat window event
 const tp=$$('tp');if(tp){const d=document.createElement('div');d.innerHTML='<h3>PROGRESS</h3><button id="xun">UNLOCK ULTIMATE CUSTOM NIGHT</button>';tp.insertBefore(d,tp.firstChild.nextSibling||null);$$('xun').onclick=()=>{LS('stn_ucn','1');menuX();toast('CUSTOM NIGHT UNLOCKED')}}
+})();
+</script>
+<script>
+// ================= 2 PLAYER (up to 7) - peer to peer via PeerJS public broker, no account needed =================
+(function(){
+const $$=id=>document.getElementById(id);
+const MOCK=/mpmock/.test(location.hash);
+const MP={on:false,host:false,peer:null,conns:[],hostConn:null,code:'',names:[],start:false,fromHost:false};window.MP=MP;
+const isC=()=>MP.on&&!MP.host&&MP.start,isH=()=>MP.on&&MP.host&&MP.start;
+// ---- mock transport (testing only, #mpmock)
+class MC{constructor(p,id){this.p=p;this.peer=id;this.h={}}on(e,f){(this.h[e]=this.h[e]||[]).push(f);return this}emit(e,...a){(this.h[e]||[]).forEach(f=>f(...a))}send(d){this.p.bc.postMessage({to:this.peer,from:this.p.id,k:'data',d})}close(){this.p.bc.postMessage({to:this.peer,from:this.p.id,k:'close'});this.emit('close')}}
+class MPeer{constructor(id){this.id=id||'m'+Math.random().toString(36).slice(2,8);this.h={};this.cs={};this.bc=new BroadcastChannel('stnmock');
+this.bc.onmessage=e=>{const d=e.data;if(d.to!==this.id)return;if(d.k==='conn'){const c=new MC(this,d.from);this.cs[d.from]=c;this.emit('connection',c);setTimeout(()=>{c.emit('open');this.bc.postMessage({to:d.from,from:this.id,k:'ack'})},0)}else if(d.k==='ack'){const c=this.cs[d.from];c&&c.emit('open')}else if(d.k==='data'){const c=this.cs[d.from];c&&c.emit('data',d.d)}else if(d.k==='close'){const c=this.cs[d.from];c&&c.emit('close')}};setTimeout(()=>this.emit('open',this.id),0)}
+on(e,f){(this.h[e]=this.h[e]||[]).push(f);return this}emit(e,...a){(this.h[e]||[]).forEach(f=>f(...a))}
+connect(id){const c=new MC(this,id);this.cs[id]=c;this.bc.postMessage({to:id,from:this.id,k:'conn'});return c}destroy(){try{this.bc.close()}catch(e){}}}
+const PeerC=()=>MOCK?MPeer:window.Peer;
+function loadLib(cb){if(MOCK||window.Peer){cb();return}const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=cb;s.onerror=()=>status('COULD NOT LOAD THE ONLINE LIBRARY. CHECK YOUR INTERNET.');document.head.appendChild(s)}
+
+// ---- UI
+const st=document.createElement('style');st.textContent='#mp{background:#000;z-index:62;font:10px PS2P,monospace;color:#fff;justify-content:center;gap:10px}#mp h2{color:#e22;font-size:20px;margin:0 0 6px}#mp input,#mp select{font:12px PS2P,monospace;background:#000;color:#fff;border:2px solid #fff;padding:8px;text-align:center}#mp input{width:120px;letter-spacing:.3em}#mp .bt{margin:0;padding:10px 18px}#mpst{color:#ff0;min-height:12px;font-size:9px}#mpl{border:2px solid #555;padding:10px 20px;min-width:260px;line-height:2.2;text-align:left}#mpcode{font-size:30px;letter-spacing:.3em;color:#0f0}';document.head.appendChild(st);
+const ov=document.createElement('div');ov.id='mp';ov.className='ov';ov.innerHTML='<h2>2 PLAYER</h2><div id="mpmain"><button class="bt" id="mph">HOST GAME</button><div style="margin:12px 0;color:#888">- OR -</div><input id="mpin" maxlength="4" inputmode="numeric" placeholder="CODE"> <button class="bt" id="mpj">JOIN</button></div><div id="mplob" style="display:none"><div id="mpcode"></div><div id="mpl"></div><div id="mphost"><select id="mpn"><option value="1">NIGHT 1</option><option value="2">NIGHT 2</option><option value="3">NIGHT 3</option><option value="4">NIGHT 4</option><option value="5">NIGHT 5</option></select> <button class="bt" id="mps" style="color:#f33;border-color:#f33">START</button></div><div id="mpw" style="color:#888;display:none">WAITING FOR THE HOST TO START...</div></div><div id="mpst"></div><button class="bt" id="mpb2">BACK</button>';document.body.appendChild(ov);
+const status=t=>{$$('mpst').textContent=t};
+const mb=document.createElement('button');mb.className='bt';mb.id='mpb';mb.textContent='2 PLAYER';$$('mside').insertBefore(mb,$$('reset'));
+mb.onclick=()=>{hideAll();S.mode='menu';$$('menu').className='ov';status('');showMain();ov.className='ov show';ov.style.display='flex'};
+function showMain(){$$('mpmain').style.display='block';$$('mplob').style.display='none'}
+function showLobby(){$$('mpmain').style.display='none';$$('mplob').style.display='block';$$('mpcode').textContent=MP.code;$$('mphost').style.display=MP.host?'block':'none';$$('mpw').style.display=MP.host?'none':'block';drawList();status(MP.host?'GIVE THIS CODE TO YOUR FRIENDS':'')}
+function drawList(){$$('mpl').innerHTML='PLAYERS ('+MP.names.length+'/7)<br>'+MP.names.map((n,i)=>(i+1)+'. '+n+(i===MP.me?' (YOU)':'')).join('<br>')}
+const hideMP=()=>{ov.className='ov';ov.style.display=''};
+function reset(msg){try{MP.conns.forEach(o=>o.c.close())}catch(e){}try{MP.hostConn&&MP.hostConn.close()}catch(e){}try{MP.peer&&MP.peer.destroy()}catch(e){}Object.assign(MP,{on:false,host:false,peer:null,conns:[],hostConn:null,code:'',names:[],start:false,me:0});if(msg)status(msg)}
+$$('mpb2').onclick=()=>{reset();hideMP();toMenu()};
+
+// ---- host
+const bc=d=>MP.conns.forEach(o=>{try{o.c.send(d)}catch(e){}});
+function lobbyCast(){MP.names=['HOST'].concat(MP.conns.map(o=>o.name));MP.conns.forEach((o,i)=>{try{o.c.send({t:'lobby',names:MP.names,me:i+1,code:MP.code})}catch(e){}});MP.me=0;drawList()}
+function tryHost(n){const code=String(RI(1000,9999)),P=PeerC(),p=new P('stn'+code);let ok=false;
+p.on('open',()=>{ok=true;MP.on=true;MP.host=true;MP.peer=p;MP.code=code;MP.me=0;MP.names=['HOST'];showLobby()});
+p.on('error',e=>{if(!ok&&e.type==='unavailable-id'&&n<8)tryHost(n+1);else status('ONLINE ERROR: '+(e.type||e))});
+p.on('connection',c=>{c.on('open',()=>{if(MP.start||MP.conns.length>=6){c.send({t:'full'});setTimeout(()=>c.close(),400);return}
+const used=MP.conns.map(o=>o.name);let k=2;while(used.includes('PLAYER '+k))k++;const o={c,name:'PLAYER '+k};MP.conns.push(o);lobbyCast()});
+c.on('data',d=>hostRecv(o2(c),d));c.on('close',()=>{const i=MP.conns.findIndex(o=>o.c===c);if(i>=0){MP.conns.splice(i,1);lobbyCast()}})})}
+const o2=c=>MP.conns.find(o=>o.c===c);
+$$('mph').onclick=()=>{status('CREATING LOBBY...');loadLib(()=>tryHost(0))};
+$$('mps').onclick=()=>{if(!MP.host)return;if(MP.conns.length<1){status('NEED AT LEAST 1 OTHER PLAYER (OR PLAY ALONE FROM MAIN MENU)')}const n=+$$('mpn').value;MP.start=true;S.night=n;S.endless=false;S.cu=null;hideMP();startNight()};
+// ---- join
+$$('mpj').onclick=()=>{const code=$$('mpin').value.replace(/\D/g,'');if(code.length!==4){status('ENTER THE 4 DIGIT CODE');return}status('JOINING...');loadLib(()=>{const P=PeerC(),p=new P();let opened=false;MP.peer=p;
+p.on('error',e=>{if(!opened)status('LOBBY NOT FOUND')});
+p.on('open',()=>{const c=p.connect('stn'+code,{reliable:true});MP.hostConn=c;const to=setTimeout(()=>{if(!opened){status('LOBBY NOT FOUND');reset()}},9000);
+c.on('open',()=>{opened=true;clearTimeout(to);MP.on=true;MP.host=false;MP.code=code});
+c.on('data',clientRecv);c.on('close',()=>{if(MP.on){const g=MP.start;reset();hideMP();if(g){toMenu()}else{ov.className='ov show';ov.style.display='flex';showMain();status('LOBBY CLOSED')}}})})})};
+
+// ---- shared state
+const SHK=()=>({dl:doors.L.closed?1:0,dr:doors.R.closed?1:0,ll:S.lights.L,lr:S.lights.R,lw:S.lights.W,sh:S.shut?1:0,ht:S.heat?1:0});
+function applySh(d){const t=(cur,v,b,snd)=>{if(!!cur!==!!v){return true}return false};
+if(!!doors.L.closed!==!!d.dl){doors.L.closed=!!d.dl;setBtn(B.doorL,!!d.dl);d.dl?A.doorSlam():A.doorUp()}
+if(!!doors.R.closed!==!!d.dr){doors.R.closed=!!d.dr;setBtn(B.doorR,!!d.dr);d.dr?A.doorSlam():A.doorUp()}
+if(!!S.lights.L!==!!d.ll){S.lights.L=d.ll;setBtn(B.lightL,!!d.ll)}if(!!S.lights.R!==!!d.lr){S.lights.R=d.lr;setBtn(B.lightR,!!d.lr)}if(!!S.lights.W!==!!d.lw){S.lights.W=d.lw;setBtn(B.lightW,!!d.lw)}
+if(!!S.shut!==!!d.sh){S.shut=!!d.sh;setBtn(B.shutW,S.shut);S.shut?A.doorSlam():A.doorUp()}if(!!S.heat!==!!d.ht){S.heat=!!d.ht;setBtn(B.heat,S.heat);S.heatT=0}}
+const OA2=act2;act2=function(a){if(isC()&&a!=='file'&&a!=='binder'){if(!S.out){A.click();try{MP.hostConn.send({t:'act',a})}catch(e){}}return}const r=OA2.apply(this,arguments);if(isH())bc({t:'sh',d:SHK()});return r};
+function hostRecv(o,d){if(!d||!MP.start)return;if(d.t==='act'&&S.mode==='play'){OA2(d.a);bc({t:'sh',d:SHK()})}}
+
+// ---- monster snapshot
+const F=['off','lv','room','st','goalK','shown','showSt','seed','jx','jz','wx','wt','at','wtot','angry','peek10','img','jump','walk','cr','gz','xev','xk','blk','expo','br'];
+setInterval(()=>{if(!isH()||S.mode!=='play')return;bc({t:'st',tm:S.t,pw:S.power,out:S.out?1:0,cd:S.camDown,ev:S.evil,d:SHK()});bc({t:'mon',m:MON.map(m=>F.map(k=>m[k]===undefined?null:m[k]))})},150);
+setInterval(()=>{if(!isC())return;S.rotT=999;S.t10=999;S.tkn=999},200);
+function clientRecv(d){if(!d)return;
+if(d.t==='lobby'){MP.names=d.names;MP.me=d.me;MP.code=d.code;showLobby();ov.className='ov show';ov.style.display='flex'}
+else if(d.t==='full'){reset('LOBBY IS FULL OR ALREADY STARTED')}
+else if(d.t==='start'){MP.start=true;hideMP();S.night=d.n;S.endless=false;S.cu=null;S.diff=d.diff;startNight()}
+else if(d.t==='st'&&isC()&&S.mode==='play'){if(Math.abs(S.t-d.tm)>.6)S.t=d.tm;S.power=d.pw;S.out=!!d.out;Object.keys(d.cd||{}).forEach(k=>{if(d.cd[k]>0)S.camDown[k]=d.cd[k]});S.evil=d.ev;applySh(d.d)}
+else if(d.t==='sh'&&isC()&&S.mode==='play')applySh(d.d)
+else if(d.t==='mon'&&isC()&&S.mode==='play'){d.m.forEach((v,i)=>{const m=MON[i];if(!m)return;F.forEach((k,j)=>{if(v[j]!==null)m[k]=v[j]});if(TEX[m.img])m.asp=TEX[m.img].a;m.force=1;m.mv5=5})}
+else if(d.t==='kill'&&isC()&&S.mode==='play'){const m=MON[d.i];m.st=d.st;m.goalK=d.k;m.room=d.rm;MP.fromHost=1;try{oK(m,d.f)}finally{MP.fromHost=0}}
+else if(d.t==='scare'&&isC()&&S.mode==='play'){const m=MON[d.i];S.prevMode='play';S.mode='dead';S.cam=false;$$('camui').className='';$$('camoff').style.display='none';A.setCam(false);A.setBuzz(0);A.silence();S.pan10=null;doScare(m,gameOverSeq)}
+else if(d.t==='win'&&isC()){MP.fromHost=1;try{oWin()}finally{MP.fromHost=0}}}
+
+// ---- wrappers
+const oTM=tickMon;tickMon=function(m,dt){if(isC()){if(m.st==='door'||m.st==='window'||m.st==='vent'){m.at-=dt;m.wt=(m.wt||0)+dt}return}return oTM(m,dt)};
+const oQ=window.questTick;if(oQ)window.questTick=function(dt){if(isC())return;return oQ(dt)};
+const o24=window.tick24;if(o24)window.tick24=function(dt){if(isC()){if(S.atkCD>0)S.atkCD-=dt;return}return o24(dt)};
+const oES=evilStart;evilStart=function(){if(isC())return;return oES.apply(this,arguments)};
+const oK=kill;kill=function(m,force){if(isC()&&!MP.fromHost)return;const r=oK.apply(this,arguments);if(isH()&&S.mode==='dying')bc({t:'kill',i:m.idx,st:m.st,k:m.goalK,rm:m.room,f:!!force});return r};
+const oWin=win;win=function(){if(isC()&&!MP.fromHost)return;const r=oWin.apply(this,arguments);if(isH())bc({t:'win'});return r};
+const oDS=doScare;doScare=function(m,done,mode){if(isH()&&m&&m.xt==='chase'&&done===gameOverSeq)bc({t:'scare',i:m.idx});return oDS.apply(this,arguments)};
+const oSN=startNight;startNight=function(){if(MP.on&&MP.host&&MP.start)bc({t:'start',n:S.night,diff:S.diff});return oSN.apply(this,arguments)};
+const oTMn=toMenu;toMenu=function(){if(MP.on){reset();hideMP()}return oTMn.apply(this,arguments)};$$('tomenu').onclick=()=>toMenu();
+document.addEventListener('click',e=>{if(isC()&&(e.target.id==='retry'||e.target.id==='nnext')){e.stopImmediatePropagation();e.preventDefault();const t=e.target;const o=t.textContent;t.textContent='WAITING FOR HOST';setTimeout(()=>{t.textContent=o},1500)}},true);
+})();
+</script>
+<script>// ================= PAUSE MENU (ESC) =================
+(function(){
+const $$=id=>document.getElementById(id);let paused=false;
+const st=document.createElement('style');st.textContent='#pz{background:rgba(0,0,0,.88);z-index:70;font:10px PS2P,monospace;color:#fff;gap:10px}#pz h2{color:#e22;font-size:20px;margin:0 0 8px}#pz .bt{margin:0;min-width:240px;padding:10px 18px}#pz .row{display:flex;align-items:center;gap:10px}#pz input[type=range]{width:150px}#pzn{color:#888;font-size:8px}';document.head.appendChild(st);
+const ov=document.createElement('div');ov.id='pz';ov.className='ov';ov.innerHTML='<h2>PAUSED</h2><button class="bt" id="pzr">RESUME</button><div class="row"><span>VOLUME</span><input type="range" id="pzv" min="0" max="100" value="90"></div><button class="bt" id="pzg">GRAPHICS</button><button class="bt" id="pzf">FULLSCREEN</button><button class="bt" id="pzm" style="color:#f55;border-color:#f55">MAIN MENU</button><div id="pzn">ESC = RESUME</div>';document.body.appendChild(ov);
+const gl=['STANDARD','HIGH','4K'];const upG=()=>{try{$$('pzg').textContent='GRAPHICS: '+gl[getGFX()]}catch(e){$$('pzg').style.display='none'}};
+function pause(){if(paused||S.mode!=='play'||S.reading)return;paused=true;const mp=window.MP&&MP.on;if(!mp){S.reading=true;try{A.ctx.suspend()}catch(e){}}$$('pzn').textContent=mp?'ESC = RESUME (ONLINE: GAME KEEPS RUNNING)':'ESC = RESUME';try{$$('pzv').value=Math.round(A.m.gain.value*100)}catch(e){}upG();ov.className='ov show';ov.style.display='flex';S.hold=null}
+function resume(){if(!paused)return;paused=false;ov.className='ov';ov.style.display='';if(!(window.MP&&MP.on)){S.reading=false;try{A.resume()}catch(e){}}}
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(paused){e.preventDefault();e.stopImmediatePropagation();resume();return}if(S.mode==='play'&&!S.reading&&!$$('lore').classList.contains('show')){e.preventDefault();e.stopImmediatePropagation();pause()}},true);
+$$('pzr').onclick=resume;
+$$('pzv').oninput=e=>{try{A.m.gain.value=+e.target.value/100}catch(x){}};
+$$('pzg').onclick=()=>{try{setGFX((getGFX()+1)%3)}catch(e){}upG()};
+$$('pzf').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+$$('pzm').onclick=()=>{resume();S.reading=false;toMenu()};
+setInterval(()=>{if(paused&&S.mode!=='play'){paused=false;ov.className='ov';ov.style.display=''}},300);
 })();
 </script>
 </body></html>
