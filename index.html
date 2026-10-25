@@ -2372,7 +2372,7 @@ addEventListener('keydown',e=>{const k=KM[e.code];if(!k)return;if(S.mode==='play
 addEventListener('keyup',e=>{const k=KM[e.code];if(k&&S.hold===k)S.hold=null});addEventListener('blur',()=>{S.hold=null});
 // menu dark static
 const ms=document.createElement('canvas');ms.width=160;ms.height=90;ms.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:19;pointer-events:none;image-rendering:pixelated;opacity:1;display:none';document.body.appendChild(ms);const mc=ms.getContext('2d'),mi=mc.createImageData(160,90);let msT=0;
-function menuStatic(dt){const on=S.mode==='menu';ms.style.display=on?'block':'none';if(!on)return;msT-=dt;if(msT>0)return;msT=.06;const d=mi.data;for(let i=0;i<d.length;i+=4){const v=Math.random()*70|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}mc.putImageData(mi,0,0)}
+function menuStatic(dt){const on=S.mode==='menu';ms.style.display=on?'block':'none';if(!on)return;msT-=dt;if(msT>0)return;msT=.06;const d=mi.data;for(let i=0;i<d.length;i+=4){const v=Math.random()*26|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}mc.putImageData(mi,0,0)}
 setInterval(()=>{try{menuStatic(1)}catch(e){}},70);
 // window red warning
 const red=document.createElement('div');red.style.cssText='position:fixed;inset:0;z-index:26;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,rgba(120,0,0,.15) 20%,rgba(200,0,0,.85) 100%);mix-blend-mode:multiply';document.body.appendChild(red);
@@ -3393,6 +3393,30 @@ const pl=document.createElement('button');pl.className='bt';pl.id='pzl';pl.textC
 function upLabels(){const t='LANGUAGE: '+NAMES_L[lang];lb.textContent=t;pl.textContent=t;lb._t=undefined}
 const cyc=()=>setLang(ORDER_L[(ORDER_L.indexOf(lang)+1)%ORDER_L.length]);lb.onclick=()=>{cyc();lb.blur()};pl.onclick=()=>{cyc();pl.blur()};
 upLabels();walk();
+})();
+</script>
+<script>// ================= v68: new main menu layout =================
+(function(){
+const $$=id=>document.getElementById(id),LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const st=document.createElement('style');st.textContent='#menu{flex-direction:column!important;justify-content:flex-start!important;align-items:center!important;overflow:auto;padding:10px 0 20px}#mside .bt{padding:8px 10px!important}#mside{gap:5px!important}#mtitle{position:static!important;text-align:center!important;margin:0 0 10px!important;font-size:clamp(22px,4vw,44px)!important;text-shadow:3px 3px #600!important;order:0}#mside{margin:0!important;width:min(380px,88vw)!important;align-items:stretch;order:1}#mmon{opacity:.5;pointer-events:none}#ngrow{display:flex;gap:4px}#ngrow .bt{flex:1}#ngdiff{font:9px PS2P,monospace;background:#000;color:#fff;border:3px solid #fff;padding:6px;cursor:pointer}#mhint{text-align:center!important;margin:8px 0 2px!important;font-size:7px!important;line-height:1.7!important}.mdiv{color:#777;font-size:8px;text-align:center;margin:12px 0 2px;letter-spacing:.15em}.mlk{opacity:.28;pointer-events:none;filter:grayscale(1)}#stg{background:#000;z-index:62;font:10px PS2P,monospace;color:#fff;gap:10px}#stg h2{color:#e22;font-size:20px;margin:0 0 8px}#stg .bt{margin:0;min-width:260px;padding:10px 18px}#stg .row{display:flex;align-items:center;gap:10px}#stg input[type=range]{width:150px}';document.head.appendChild(st);
+const side=$$('mside'),menu=$$('menu');menu.insertBefore($$('mtitle'),side);
+// language lives in the game's SETTINGS page
+const lb=$$('langb');const sbx=$$('sbox');if(lb&&sbx){const r=document.createElement('div');r.className='sr';r.innerHTML='<span>LANGUAGE</span>';lb.style.cssText='';r.appendChild(lb);sbx.appendChild($$('s_fps')?$$('s_fps').parentNode.parentNode===sbx?r:r:r)}
+const vg0=$$('vgn');if(vg0)vg0.remove();
+// difficulty dropdown on NEW GAME
+const dd=$$('diff');dd.style.display='none';
+const row=document.createElement('div');row.id='ngrow';const sel=document.createElement('select');sel.id='ngdiff';sel.title='DIFFICULTY';
+Object.keys(DIFF).forEach(k=>sel.add(new Option(DIFF[k].n,k)));row.appendChild($$('start'));row.appendChild(sel);
+sel.onchange=()=>{S.diff=sel.value;try{localStorage.setItem('stn_diff',S.diff)}catch(e){}dd.textContent='DIFFICULTY: '+DIFF[S.diff].n};
+const div=t=>{const d=document.createElement('div');d.className='mdiv';d.textContent=t;return d};
+// order
+const seq=[row,$$('cont'),$$('mpb'),$$('mbind'),$$('mhint'),div('- UNLOCKABLES -'),$$('extras'),$$('freebtn'),$$('unk'),$$('ucnb'),$$('reset'),$$('mprog')];
+seq.forEach(e=>{if(e)side.appendChild(e)});
+const locks=[['extras',()=>LS('stn_b5')==='1'||/extras/.test(location.hash)],['unk',()=>LS('stn_b5')==='1'],['freebtn',()=>LS('stn_free')==='1'],['ucnb',()=>LS('stn_ucn')==='1']];
+function lockUI(){sel.value=S.diff;locks.forEach(([id,f])=>{const e=$$(id);if(!e)return;const ok=f();e.style.display='block';e.classList.toggle('mlk',!ok);e.disabled=!ok});const u=$$('ucnb');if(u&&u.firstChild&&!/LOCKED/.test(u.textContent)===false)u.textContent='ULTIMATE CUSTOM NIGHT';
+const c=$$('cont');if(c&&c.style.display==='none'){}}
+const oTM=toMenu;toMenu=function(){const r=oTM.apply(this,arguments);lockUI();return r};
+setInterval(()=>{if(S.mode==='menu')lockUI()},400);lockUI();
 })();
 </script>
 </body></html>
