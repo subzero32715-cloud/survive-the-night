@@ -3222,7 +3222,7 @@ class MPeer{constructor(id){this.id=id||'m'+Math.random().toString(36).slice(2,8
 this.bc.onmessage=e=>{const d=e.data;if(d.to!==this.id)return;if(d.k==='conn'){const c=new MC(this,d.from);this.cs[d.from]=c;this.emit('connection',c);setTimeout(()=>{c.emit('open');this.bc.postMessage({to:d.from,from:this.id,k:'ack'})},0)}else if(d.k==='ack'){const c=this.cs[d.from];c&&c.emit('open')}else if(d.k==='data'){const c=this.cs[d.from];c&&c.emit('data',d.d)}else if(d.k==='close'){const c=this.cs[d.from];c&&c.emit('close')}};setTimeout(()=>this.emit('open',this.id),0)}
 on(e,f){(this.h[e]=this.h[e]||[]).push(f);return this}emit(e,...a){(this.h[e]||[]).forEach(f=>f(...a))}
 connect(id){const c=new MC(this,id);this.cs[id]=c;this.bc.postMessage({to:id,from:this.id,k:'conn'});return c}destroy(){try{this.bc.close()}catch(e){}}}
-const PeerC=()=>MOCK?MPeer:window.Peer;
+const ICE={config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]},debug:0};const PeerC=()=>MOCK?MPeer:window.Peer;
 function loadLib(cb){if(MOCK||window.Peer){cb();return}const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=cb;s.onerror=()=>status('COULD NOT LOAD THE ONLINE LIBRARY. CHECK YOUR INTERNET.');document.head.appendChild(s)}
 
 // ---- UI
@@ -3264,8 +3264,8 @@ $$('mpb2').onclick=()=>{reset();hideMP();toMenu()};
 // ---- host
 const bc=d=>MP.conns.forEach(o=>{try{o.c.send(d)}catch(e){}});
 function lobbyCast(){MP.names=['HOST'].concat(MP.conns.map(o=>o.name));MP.conns.forEach((o,i)=>{try{o.c.send({t:'lobby',names:MP.names,me:i+1,code:MP.code})}catch(e){}});MP.me=0;drawList()}
-function tryHost(n){const code=String(RI(1000,9999)),P=PeerC(),p=new P('stn'+code);let ok=false;
-setupPeer(p);p.on('open',()=>{ok=true;MP.on=true;MP.host=true;MP.peer=p;MP.code=code;MP.me=0;MP.names=['HOST'];showLobby()});
+function tryHost(n){const code=String(RI(1000,9999)),P=PeerC(),p=new P('stn'+code,ICE);let ok=false;
+setupPeer(p);p.on('disconnected',()=>{try{p.reconnect()}catch(e){}});p.on('open',()=>{ok=true;MP.on=true;MP.host=true;MP.peer=p;MP.code=code;MP.me=0;MP.names=['HOST'];showLobby()});
 p.on('error',e=>{if(!ok&&e.type==='unavailable-id'&&n<8)tryHost(n+1);else status('ONLINE ERROR: '+(e.type||e))});
 p.on('connection',c=>{c.on('open',()=>{if(MP.start||MP.conns.length>=6){c.send({t:'full'});setTimeout(()=>c.close(),400);return}
 const used=MP.conns.map(o=>o.name);let k=2;while(used.includes('PLAYER '+k))k++;const o={c,name:'PLAYER '+k};MP.conns.push(o);lobbyCast()});
@@ -3278,9 +3278,9 @@ if(v==='c'){const u=window.UCNcode&&UCNcode.dec($$('mpcu').value.trim());if(!u){
 MP.start=true;S.night=+v;S.endless=false;S.cu=null;hideMP();startNight()};
 function applyCu(u){S.cuPrev=S.cuPrev||S.diff;S.cu=JSON.parse(JSON.stringify(u));S.endless=false;S.free=false;S.freeRetry=false;S.night=5;S.diff=u.nm?'nightmare':'normal';TEST.atk=u.atk;TEST.angry=!!u.angry}
 // ---- join
-$$('mpj').onclick=()=>{const code=$$('mpin').value.replace(/\D/g,'');if(code.length!==4){status('ENTER THE 4 DIGIT CODE');return}status('JOINING...');loadLib(()=>{const P=PeerC(),p=new P();let opened=false;MP.peer=p;setupPeer(p);
-p.on('error',e=>{if(!opened)status('LOBBY NOT FOUND')});
-p.on('open',()=>{const c=p.connect('stn'+code,{reliable:true});MP.hostConn=c;const to=setTimeout(()=>{if(!opened){status('LOBBY NOT FOUND');reset()}},9000);
+$$('mpj').onclick=()=>{const code=$$('mpin').value.replace(/\D/g,'');if(code.length!==4){status('ENTER THE 4 DIGIT CODE');return}status('JOINING...');loadLib(()=>{const P=PeerC(),p=new P(undefined,ICE);let opened=false;MP.peer=p;setupPeer(p);
+p.on('error',e=>{if(opened)return;status(e.type==='peer-unavailable'?'LOBBY NOT FOUND - CHECK THE CODE (HOST MUST BE IN THE LOBBY)':'CONNECTION ERROR: '+(e.type||e)+' - TRY AGAIN')});p.on('disconnected',()=>{try{p.reconnect()}catch(e){}});
+p.on('open',()=>{const c=p.connect('stn'+code,{reliable:true});MP.hostConn=c;const to=setTimeout(()=>{if(!opened){status('COULD NOT CONNECT - HOST MAY BE BEHIND A STRICT FIREWALL. TRY AGAIN');reset()}},25000);
 c.on('open',()=>{opened=true;clearTimeout(to);MP.on=true;MP.host=false;MP.code=code;try{c.send({t:'hi',pid:p.id})}catch(e){}});
 c.on('data',clientRecv);c.on('close',()=>{if(MP.on){const g=MP.start;reset();hideMP();if(g){toMenu()}else{ov.className='ov show';ov.style.display='flex';showMain();status('LOBBY CLOSED')}}})})})};
 
@@ -3294,6 +3294,7 @@ if(!!S.shut!==!!d.sh){S.shut=!!d.sh;setBtn(B.shutW,S.shut);S.shut?A.doorSlam():A
 const OA2=act2;act2=function(a){if(isC()&&a!=='file'&&a!=='binder'){if(!S.out){A.click();try{MP.hostConn.send({t:'act',a})}catch(e){}}return}const r=OA2.apply(this,arguments);if(isH())bc({t:'sh',d:SHK()});return r};
 function hostRecv(o,d){if(!d)return;
 if(d.t==='hi'){o.pid=d.pid;peersCast();return}
+if((d.t==='tp'||d.t==='tpi')&&MP.start){tpApply(d);MP.conns.forEach(q=>{if(q!==o)try{q.c.send(d)}catch(e){}});return}
 if(d.t==='chat'){const ci=MP.conns.indexOf(o)+1;if(ci>0)chatIn(ci,d.m);return}
 if(d.t==='pos'&&MP.start&&MP.free){const i=MP.conns.indexOf(o)+1;setAv(i,d);MP.conns.forEach(q=>{if(q!==o)try{q.c.send({t:'pos',i,x:d.x,y:d.y,z:d.z,yaw:d.yaw})}catch(e){}});return}
 if(!MP.start)return;if(d.t==='act'&&S.mode==='play'){OA2(d.a);bc({t:'sh',d:SHK()})}}
@@ -3304,6 +3305,7 @@ setInterval(()=>{if(!isH()||S.mode!=='play')return;bc({t:'st',tm:S.t,pw:S.power,
 setInterval(()=>{if(!isC())return;S.rotT=999;S.t10=999;S.tkn=999},200);
 function clientRecv(d){if(!d)return;
 if(d.t==='lobby'){MP.names=d.names;MP.me=d.me;MP.code=d.code;showLobby();ov.className='ov show';ov.style.display='flex'}
+else if((d.t==='tp'||d.t==='tpi')&&MP.start){tpApply(d)}
 else if(d.t==='chatb'){chatLine(d.n,d.m)}
 else if(d.t==='peers'){MP.peers=d.ids.filter(x=>x!==(MP.peer&&MP.peer.id));callAll()}
 else if(d.t==='pos'&&MP.free){setAv(d.i,d)}
@@ -3329,6 +3331,12 @@ const oSN=startNight;startNight=function(){if(MP.on&&MP.host&&MP.start)bc({t:'st
 const oTMn=toMenu;toMenu=function(){if(MP.on){reset();hideMP()}return oTMn.apply(this,arguments)};$$('tomenu').onclick=()=>toMenu();
 document.addEventListener('click',e=>{if(isC()&&(e.target.id==='retry'||e.target.id==='nnext')){e.stopImmediatePropagation();e.preventDefault();const t=e.target;const o=t.textContent;t.textContent='WAITING FOR HOST';setTimeout(()=>{t.textContent=o},1500)}},true);
 
+// ---- test panel: everything triggered by anyone happens for everyone
+const tpEls=()=>{const t=$$('tp');return t?[...t.querySelectorAll('button,input,select')]:[]};
+function tpSend(m){if(MP.host)bc(m);else try{MP.hostConn.send(m)}catch(e){}}
+function tpApply(d){const e=tpEls()[d.i];if(!e)return;MP.tpR=1;try{if(d.t==='tp')e.click();else{if(e.type==='checkbox')e.checked=!!d.v;else e.value=d.v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}}finally{MP.tpR=0}}
+document.addEventListener('click',e=>{if(!MP.on||!MP.start||MP.tpR)return;const b=e.target.closest&&e.target.closest('#tp button');if(!b)return;const i=tpEls().indexOf(b);if(i>=0)tpSend({t:'tp',i})},true);
+document.addEventListener('change',e=>{if(!MP.on||!MP.start||MP.tpR)return;const x=e.target;if(!x.closest||!x.closest('#tp'))return;const i=tpEls().indexOf(x);if(i>=0)tpSend({t:'tpi',i,v:x.type==='checkbox'?x.checked:x.value})},true);
 // ---- free mode: see each other + respawn instead of everybody dying
 const AV={};
 function nameTex(n){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='bold 30px monospace';x.textAlign='center';x.fillStyle='rgba(0,0,0,.6)';x.fillRect(0,8,256,48);x.fillStyle='#fff';x.fillText(n,128,44);const t=new THREE.CanvasTexture(c);return t}
