@@ -1297,7 +1297,7 @@ if(S.mode==='play'){
 if(S.day)tickDay(dt);else{S.t+=dt;if(S.t>=NIGHT_LEN)win()}
 if(S.mode==='play'){
 for(const k in S.camDown){if(S.camDown[k]>0){S.camDown[k]-=dt;if(S.camDown[k]<=0){S.camDown[k]=0;A.blip()}}}
-S.pwT+=dt;if(S.pwT>=8){S.pwT-=8;if(!S.out&&!(S.pwFreeze>0)){S.power-=usage();if(S.power<=0){S.power=0;S.out=true;S.outT=0;S.eyes=false;A.playBox(true,.8);doors.L.closed=doors.R.closed=false;S.shut=false;S.lights.L=S.lights.R=S.lights.W=0;setBtn(B.doorL,0);setBtn(B.doorR,0);setBtn(B.shutW,0);setBtn(B.lightL,0);setBtn(B.lightR,0);setBtn(B.lightW,0);A.doorUp();S.pan10=null;S.outSide=S.yaw>.25?'R':'L';S.cam&&toggleCam();S.lights={L:0,R:0,W:0};S.shut=false;S.heat=false;doors.L.closed=doors.R.closed=false;['doorL','doorR','lightL','lightR','lightW','shutW','heat'].forEach(k=>setBtn(B[k],false));A.powerDown();A.setBuzz(0);$('camui').className=''}}}
+S.pwT+=dt;if(S.pwT>=8){S.pwT-=8;if(!S.out&&!(S.pwFreeze>0)){S.power-=usage()*START/100*((window.MUT&&MUT.leak)?1.5:1);if(S.power<=0){S.power=0;S.out=true;S.outT=0;S.eyes=false;A.playBox(true,.8);doors.L.closed=doors.R.closed=false;S.shut=false;S.lights.L=S.lights.R=S.lights.W=0;setBtn(B.doorL,0);setBtn(B.doorR,0);setBtn(B.shutW,0);setBtn(B.lightL,0);setBtn(B.lightR,0);setBtn(B.lightW,0);A.doorUp();S.pan10=null;S.outSide=S.yaw>.25?'R':'L';S.cam&&toggleCam();S.lights={L:0,R:0,W:0};S.shut=false;S.heat=false;doors.L.closed=doors.R.closed=false;['doorL','doorR','lightL','lightR','lightW','shutW','heat'].forEach(k=>setBtn(B[k],false));A.powerDown();A.setBuzz(0);$('camui').className=''}}}
 if(S.out){S.outT+=dt;if(S.outT>=7&&!S.eyes){S.eyes=true;A.eyes()}EYE[S.outSide].visible=S.eyes&&Math.random()>.08;if(S.outT>=10){A.musicbox();kill(firstOn())}}
 if(S.heat&&!S.out){S.heatT-=dt;if(S.heatT<=0){S.heatT=2;A.heat()}}
 if(S.night>=5&&S.evil===0&&S.t>=5*HOUR&&!(S.cu&&!S.cu.evil))evilStart();
@@ -1321,7 +1321,7 @@ if(!S.cam&&!S.free){corrL.visible=zv.L>.03;corrR.visible=zv.R>.03;PPg.visible=zv
 hallL.intensity=hallR.intensity=winL.intensity=0;lamp.intensity=S.out?0:(fl<.02?.35:.95);
 ['L','R'].forEach(k=>{const ven=MON.some(m=>act(m)&&m.st==='vent'&&m.goalK===k);VENT[k].light.color.setHex(S.heat&&!S.out?0xff6a10:ven?(Math.random()<.5?0xa88a40:0x5a4a20):(S.out?0x0c0a06:0x4a3a18))});
 if(window.tick8)tick8(rdt);const downNow=S.cam&&S.camDown[S.camRoom]>0;
-if(S.cam&&!downNow){const li=ROOMS[S.camRoom].li;camL.position.set(li[0][0],li[0][1],li[0][2]);camL.color.setHex(li[2]);camL.intensity=li[1]*(S.day?.62*(1+.5*(S.dayL||0)):.38)+(S.flash?3:0)}else camL.intensity=0;
+if(S.cam&&!downNow){const li=ROOMS[S.camRoom].li;camL.position.set(li[0][0],li[0][1],li[0][2]);camL.color.setHex(li[2]);camL.intensity=(S.day?li[1]*.62*(1+.5*(S.dayL||0)):0)+(S.flash?3:0)}else camL.intensity=0;
 if(S.mode!=='free')place();
 const dgv=S.mode==='play'?Math.round((S.dg||0)*20)/20:0;if(lastTxt.dg!==dgv){lastTxt.dg=dgv;$('danger').style.opacity=dgv}
 const pl=S.mode==='play'||S.mode==='dying'||S.mode==='dead'||S.mode==='win'||S.mode==='intro';setDisp('hud',pl?'block':'none');setDisp('camb',S.mode==='play'?'block':'none');setDisp('bbtn','none');
@@ -3523,4 +3523,217 @@ if(Math.random()<.5){let k=0;const iv=setInterval(()=>{fl.style.opacity=k%2?0:.9
 }catch(e){}},250);
 })();
 </script>
+<script>(function(){
+const $$=id=>document.getElementById(id);
+const st=document.createElement('style');st.textContent='#ghf{position:fixed;inset:0;pointer-events:none;z-index:13;opacity:0;background:center/contain no-repeat;mix-blend-mode:screen}#eyes{position:fixed;pointer-events:none;z-index:13;opacity:0;transition:opacity .4s}#eyes i{display:inline-block;width:9px;height:5px;border-radius:50%;background:#f22;box-shadow:0 0 12px 4px #f00;margin:0 16px}#txg{position:fixed;left:0;right:0;top:42%;text-align:center;font:30px PS2P,monospace;color:#900;pointer-events:none;z-index:14;opacity:0;letter-spacing:.2em}';document.head.appendChild(st);
+const gh=document.createElement('div');gh.id='ghf';const ey=document.createElement('div');ey.id='eyes';ey.innerHTML='<i></i><i></i>';const tx=document.createElement('div');tx.id='txg';document.body.append(gh,ey,tx);
+const R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.random()*a.length|0];
+const ids=()=>MON.filter(m=>m.reg&&IMG[m.img]);
+function flash(o,ms){gh.style.backgroundImage='url(data:image/png;base64,'+IMG[ids()[0]?pick(ids()).img:'']+')';gh.style.opacity=o;setTimeout(()=>gh.style.opacity=0,ms)}
+const msgs=['BEHIND YOU','HE SEES YOU','DONT LOOK','STILL HERE','RUN','NOT ALONE'];
+let tCam=R(25,50),tOff=R(90,200),tEye=R(30,70),tTxt=R(40,90),last=performance.now(),lastCam=null;
+setInterval(()=>{const now=performance.now(),dt=Math.min(1,(now-last)/1000);last=now;if(S.mode!=='play'||S.reading||S.day){return}
+const night=Math.min(5,S.night||1),k=.7+night*.15;
+if(S.cam){tCam-=dt*k;if(tCam<=0){tCam=R(20,55);try{flash(.35,110);A.noise(.25,.25,{type:'bandpass',f:1200,q:5});setTimeout(()=>flash(.2,70),260)}catch(e){}}
+ if(S.camRoom!==lastCam){lastCam=S.camRoom;if(Math.random()<.18){try{A.noise(.9,.18,{type:'bandpass',f:700,to:1700,q:6,att:.3});A.tone(210,.8,'sawtooth',.05,{to:150})}catch(e){}}}
+ const cn=$$('camname');if(cn&&Math.random()<dt*.02){const o=cn.textContent;cn.textContent=pick(msgs);setTimeout(()=>{cn.textContent=o},180)}}
+else{tOff-=dt*k;if(tOff<=0){tOff=R(110,240);flash(.55,60)}
+ tEye-=dt*k;if(tEye<=0){tEye=R(35,80);const x=Math.random()<.5?R(3,14):R(70,88),y=R(18,70);ey.style.left=x+'vw';ey.style.top=y+'vh';ey.style.opacity=1;setTimeout(()=>{ey.style.opacity=0},R(500,900));setTimeout(()=>{ey.style.opacity=1},1100);setTimeout(()=>{ey.style.opacity=0},R(1500,2200))}}
+tTxt-=dt*k;if(tTxt<=0){tTxt=R(60,140);tx.textContent=pick(msgs);tx.style.opacity=.85;setTimeout(()=>tx.style.opacity=0,120)}
+},250)})();</script>
+<script>(function(){
+const $$=id=>document.getElementById(id);
+const st=document.createElement('style');st.textContent='#grain{display:none!important}#gmsg{position:fixed;left:0;right:0;top:20%;text-align:center;font:16px PS2P,monospace;color:#d22;text-shadow:2px 2px #000;pointer-events:none;z-index:15;opacity:0;transition:opacity .3s;letter-spacing:.1em}#sil{position:fixed;inset:0;pointer-events:none;z-index:12;opacity:0;transition:opacity 1.2s;background:radial-gradient(ellipse at center,rgba(0,0,0,.2) 15%,rgba(0,0,0,.95) 100%)}';document.head.appendChild(st);
+const gm=document.createElement('div');gm.id='gmsg';const sil=document.createElement('div');sil.id='sil';document.body.append(gm,sil);
+const R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.random()*a.length|0];
+let gt=0;function say(t,ms){gm.textContent=t;gm.style.opacity=1;clearTimeout(gt);gt=setTimeout(()=>gm.style.opacity=0,ms||2200)}
+const B={lightBreak:{L:0,R:0,W:0},jam:{L:0,R:0},an:{L:0,R:0},sil:0,silCam:false};
+const nowS=()=>performance.now()/1000;
+const oA=act2;act2=function(a){const n=nowS();
+if(S.mode==='play'){
+ if(B.sil>n){caught();return oA.apply(this,arguments)}
+ const lk=a==='Llight'?'L':a==='Rlight'?'R':a==='Wlight'?'W':null;
+ if(lk&&B.lightBreak[lk]>n){try{A.noise(.15,.3,{type:'bandpass',f:2500,q:6})}catch(e){}say('LIGHT SHORTED OUT',1200);return}
+ const dk=a==='Ldoor'?'L':a==='Rdoor'?'R':null;
+ if(dk&&B.jam[dk]>n&&!doors[dk].closed){if(!B.an[dk]){B.an[dk]=performance.now();say('THE DOOR IS JAMMED',1800)}return}}
+return oA.apply(this,arguments)};
+function caught(){B.sil=0;sil.style.opacity=0;try{A.m.gain.value=B.vol}catch(e){}say('IT HEARD YOU',2500);
+try{A.knock&&A.knock();A.tone(45,1.2,'sine',.9,{to:25});A.noise(.8,.7,{type:'highpass',f:1500})}catch(e){}
+S.power=Math.max(1,S.power-START*.06);
+const c=pick(CAMS);S.camDown[c]=(S.camDown[c]||0)+22}
+
+// door jam animation: slides halfway, grinds, stutters, breaks, springs back up
+(function ra(){requestAnimationFrame(ra);if(S.mode!=='play')return;['L','R'].forEach(k=>{const t0=B.an[k];if(!t0)return;const d=doors[k];if(d.closed){B.an[k]=0;return}const e=(performance.now()-t0)/1000,up=6.5,half=4.0;let y;
+if(e<.45){y=up+(half-up)*(e/.45)*(e/.45);if(!B.s1){B.s1=1;try{A.doorSlam&&0;A.noise(.45,.35,{f:250,to:120})}catch(x){}}}
+else if(e<1.25){B.s1=0;const j=Math.floor(e*18);y=half+((j*7919%10)/10)*.7-.1+(Math.random()-.5)*.12;if(j!==B.sj){B.sj=j;try{A.tone(70+Math.random()*60,.12,'square',.3,{to:35});if(j%3===0)A.noise(.12,.4,{type:'bandpass',f:900,q:4})}catch(x){}}}
+else if(e<1.6){const p=(e-1.25)/.35;y=half+(up-half)*p*p+Math.sin(p*40)*.15*(1-p);if(!B.s2){B.s2=1;try{A.tone(40,.6,'sine',.8,{to:25});A.noise(.35,.6,{type:'highpass',f:1500})}catch(x){}setTimeout(()=>{try{A.knock&&A.knock()}catch(x){}},500)}}
+else{B.an[k]=0;B.s2=0;return}
+d.mesh.position.y=y})})();
+
+// ---- creeping drone + dissonant stingers, grows through the night
+(function(){let o1,o2,g,lf,ok=false;function init(){if(ok||!A.ready||!A.ctx)return;try{const c=A.ctx;o1=c.createOscillator();o2=c.createOscillator();g=c.createGain();const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=140;o1.type='sawtooth';o2.type='sawtooth';o1.frequency.value=55;o2.frequency.value=58.3;g.gain.value=0;lf=c.createOscillator();lf.frequency.value=.13;const lg=c.createGain();lg.gain.value=.012;lf.connect(lg);lg.connect(g.gain);o1.connect(f);o2.connect(f);f.connect(g);g.connect(A.m||c.destination);o1.start();o2.start();lf.start();ok=true}catch(e){}}
+let ns=R(40,90);setInterval(()=>{const on=S.mode==='play'&&!S.reading&&!S.day;init();if(!ok)return;const pr=Math.min(1,(S.t||0)/((window.HOUR||40)*6)),night=Math.min(5,S.night||1);try{g.gain.setTargetAtTime(on?.03+.03*pr+.008*night:0,A.ctx.currentTime,1.5)}catch(e){}
+if(!on)return;ns-=1;if(ns<=0){ns=R(40,100)-night*5;try{[440,466.2,622].forEach((f,i)=>A.tone(f*(Math.random()<.5?1:.5),2.6,'sine',.07,{to:f*.97,delay:i*.05}))}catch(e){}}},1000)})();
+let camWas=false;
+const evs=[
+()=>{ // SILENCE: don't move
+ say('...SILENCE...  DONT MOVE',2600);B.vol=A.m.gain.value;try{A.m.gain.value=B.vol*.04}catch(e){}sil.style.opacity=1;B.sil=nowS()+7;camWas=S.cam;
+ setTimeout(()=>{if(B.sil>0&&B.sil<=nowS()+.2){B.sil=0;sil.style.opacity=0;try{A.m.gain.value=B.vol}catch(e){}say('...IT LEFT',1500)}},7200)},
+()=>{const k=pick(['L','R','W']);B.lightBreak[k]=nowS()+R(12,20);S.lights[k]=0;say('A LIGHT SHORTED OUT',2200);try{A.noise(.4,.5,{type:'highpass',f:3000});A.tone(900,.15,'square',.2,{to:200})}catch(e){}},
+()=>{const k=pick(['L','R']);if(doors[k].closed)return;B.jam[k]=nowS()+R(10,18);say('A DOOR JAMMED OPEN',2200);try{A.tone(80,.5,'sawtooth',.4,{to:40});A.noise(.4,.4,{f:250,to:90})}catch(e){}},
+()=>{S.power=Math.max(1,S.power-START*.025);say('SOMETHING IS DRAINING POWER',2200);try{A.tone(300,1,'sawtooth',.2,{to:60})}catch(e){}},
+()=>{const c=pick(CAMS);S.camDown[c]=(S.camDown[c]||0)+25;say('CAM '+(CAMS.indexOf(c)+1)+' LOST SIGNAL',2000);try{A.noise(.6,.4,{type:'highpass',f:2000})}catch(e){}}];
+let t=R(25,45),last=performance.now();
+setInterval(()=>{const n=performance.now(),dt=Math.min(1,(n-last)/1000);last=n;
+if(B.sil>nowS()&&S.cam!==camWas){camWas=S.cam;caught()}
+if(S.mode!=='play'||S.reading||S.day||S.out){if(B.sil){B.sil=0;sil.style.opacity=0;try{A.m.gain.value=B.vol||A.m.gain.value}catch(e){}}return}
+const night=Math.min(5,S.night||1);if(night<2&&!S.cu)return;
+t-=dt*(.8+night*.2)*((window.MUT&&MUT.busy)?2:1);if(t>0||B.sil>nowS())return;t=R(30,70);try{pick(evs)()}catch(e){}},250);
+})();</script>
+<script>(function(){
+const $$=id=>document.getElementById(id);
+const st=document.createElement('style');st.textContent='#grade{position:fixed;inset:0;pointer-events:none;z-index:9;mix-blend-mode:multiply;background:#b9d6c6;opacity:0;transition:background 4s}#swing{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0}#dust{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:0}#sil2{position:fixed;bottom:0;width:11vw;height:78vh;pointer-events:none;z-index:9;opacity:0;transition:opacity .9s;background:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent);clip-path:polygon(40% 0,60% 0,64% 9%,70% 12%,82% 30%,75% 100%,25% 100%,18% 30%,30% 12%,36% 9%)}';document.head.appendChild(st);
+const gr=document.createElement('div');gr.id='grade';const sw=document.createElement('div');sw.id='swing';const du=document.createElement('canvas');du.id='dust';const sl=document.createElement('div');sl.id='sil2';document.body.append(gr,sw,du,sl);
+const cx=du.getContext('2d');const P=[];for(let i=0;i<46;i++)P.push({x:Math.random(),y:Math.random(),r:.6+Math.random()*1.6,vx:(Math.random()-.5)*.012,vy:.004+Math.random()*.01,a:.15+Math.random()*.35});
+const cv=document.getElementById('c');
+let fl=0,fT=0,t0=performance.now(),sT=70+Math.random()*60;
+function loop(now){requestAnimationFrame(loop);const play=S.mode==='play'&&!S.reading,off=play&&!S.cam&&!S.day,t=(now-t0)/1000;
+const pr=Math.min(1,(S.t||0)/((window.HOUR||40)*6));
+gr.style.opacity=off?1:0;
+// colour grade: sickly green early, bleeding to red near 5-6AM
+const red=pr>.8?Math.min(1,(pr-.8)/.2):0;gr.style.background=red>0?'rgb('+(210)+','+(Math.round(190-red*95))+','+(Math.round(180-red*100))+')':'#b4d4c2';
+sw.style.opacity=off?1:0;du.style.opacity=off?1:0;
+if(off){const w=du.width=innerWidth,h=du.height=innerHeight;
+ // swinging lamp + flicker
+ fT-=1/60;if(fT<=0){fT=.04+Math.random()*.1;fl=Math.random()<(.05+pr*.08+(S.night||1)*.01)?(Math.random()<.5?.7:.35):0}
+ const x=50+Math.sin(t*.55)*14+Math.sin(t*1.7)*2,a=Math.min(.8,.34+fl+.08*Math.sin(t*.9));
+ sw.style.background='radial-gradient(ellipse 62% 70% at '+x+'% 42%,rgba(0,0,0,0) 15%,rgba(0,0,0,'+a.toFixed(2)+') 85%)';
+ // dust
+ cx.clearRect(0,0,w,h);P.forEach(p=>{p.x+=p.vx*.016*60*.3;p.y+=p.vy*.016*60*.3;if(p.y>1)p.y=0;if(p.x<0)p.x=1;if(p.x>1)p.x=0;cx.fillStyle='rgba(210,220,200,'+p.a+')';cx.beginPath();cx.arc(p.x*w,p.y*h,p.r,0,7);cx.fill()});
+ // breathing sway of the view
+ if(cv)cv.style.transform='translate('+Math.sin(t*.7)*2+'px,'+Math.sin(t*1.1)*1.5+'px) scale(1.012)'}
+else if(cv)cv.style.transform='';
+// figure stands at the edge of the office, gone when you look
+if(off){sT-=1/60;if(sT<=0){sT=70+Math.random()*110;const L=Math.random()<.5;sl.style.left=L?'1vw':'';sl.style.right=L?'':'1vw';sl.style.opacity=.92;setTimeout(()=>{sl.style.opacity=0},900+Math.random()*900)}}else sl.style.opacity=0}
+requestAnimationFrame(loop)})();</script>
+<script>(function(){
+const o=office,wl=oWall,Z=5.55;
+// smaller office: new back wall close behind the desk
+box(o,18.6,4.2,.3,0,2.1,Z+.15,wl);box(o,18.6,.12,.3,0,.08,Z-.02,M(0x15151a));
+const rf=Math.PI;
+poster(o,-6.4,2.4,Z-.02,rf,1.2,1.6,['MISSING','HAVE YOU','SEEN ME?'],'#d8d0b0','#400');
+poster(o,-4.6,2.5,Z-.02,rf,1.1,1.4,['EMPLOYEE','OF THE','MONTH: ???'],'#c8b878','#222');
+poster(o,-2.9,2.2,Z-.02,rf,.9,1.2,['NO','SMILING','AFTER 12'],'#a02030','#fff');
+poster(o,2.6,3.0,Z-.02,rf,1.3,.7,['WE ARE','WATCHING'],'#101010','#c22');
+poster(o,6.8,2.4,Z-.02,rf,1.2,1.6,['SAFETY','FIRST','LOCK THE DOORS'],'#d8c020','#222');
+// corkboard with notes
+box(o,2.6,1.3,.06,4.3,2.1,Z-.03,M(0x8a5a30));for(let i=0;i<9;i++){const n=box(o,.3,.36,.01,3.3+(i%5)*.45,1.75+Math.floor(i/5)*.5+Math.random()*.1,Z-.08,M([0xf2e44a,0xe8e0c8,0xf29aa8,0xa8d8f0][i%4]));n.rotation.z=(Math.random()-.5)*.5}
+// wall clock stuck at 12
+const ck=cyl(o,.38,.38,.07,0,3.4,Z-.06,M(0xe8e4d4),24);ck.rotation.x=Math.PI/2;box(o,.03,.28,.02,0,3.46,Z-.11,M(0x111111));box(o,.03,.2,.02,0,3.5,Z-.11,M(0x111111));
+// filing cabinets
+[-7.7,-6.7].forEach(x=>{box(o,.9,1.5,.7,x,.75,Z-.45,M(0x585c62));for(let i=0;i<3;i++){box(o,.7,.02,.02,x,.35+i*.45,Z-.82,M(0x222222));box(o,.2,.05,.03,x,.5+i*.45,Z-.83,M(0xb0b0b0))}});
+// water cooler, dead plant, trash can
+cyl(o,.26,.26,.9,7.5,.45,Z-.5,M(0xd8e0e8),12);cyl(o,.22,.22,.4,7.5,1.1,Z-.5,M(0x70b8e8),12);
+cyl(o,.22,.17,.3,5.6,.15,Z-.5,M(0x6a3a22),10);[[0,.3,.2],[.1,.25,-.3],[-.1,.35,.1]].forEach(a=>{const q=cyl(o,.01,.015,.6,5.6+a[0],.55,Z-.5,M(0x3a2a18),5);q.rotation.z=a[2]});
+cyl(o,.2,.17,.5,-4.8,.25,Z-.5,M(0x222428),10);
+// pizza boxes + old TV cart
+[0,1,2,3].forEach(i=>{const b=box(o,.7,.07,.7,2.2,.05+i*.08,Z-.5,M(i%2?0xc8a060:0xd4b070));b.rotation.y=(Math.random()-.5)*.5});
+box(o,1,.7,.7,-3.4,.35,Z-.55,M(0x3a2a1c));box(o,.8,.55,.6,-3.4,.97,Z-.55,M(0x2a2a2e));
+const tv=new THREE.Mesh(new THREE.PlaneGeometry(.6,.4),new THREE.MeshBasicMaterial({color:0x4a5a50}));tv.position.set(-3.4,.97,Z-.86);tv.rotation.y=Math.PI;o.add(tv);window.OTV=tv;
+// rug + stain + hanging wires
+const rug=box(o,4,.02,2.4,0,.01,.9,M(0x3a1414));
+const st=new THREE.Mesh(new THREE.CircleGeometry(.7,20),new THREE.MeshBasicMaterial({color:0x2a0606,transparent:true,opacity:.75,depthWrite:false}));st.rotation.x=-Math.PI/2;st.position.set(-2.2,.025,3.6);o.add(st);
+[[-5,3],[-1.5,4.2],[4.8,3.4],[7,4.4]].forEach(a=>{const w=cyl(o,.012,.012,1.2+Math.random(),a[0],3.6,a[1],M(0x050505),4);w.rotation.z=(Math.random()-.5)*.2});
+// kid drawing taped by the window wall
+poster(o,-6.2,2.2,-3.98,0,.7,.55,['I SEE HIM','AT NIGHT'],'#e8e0c0','#a01010');
+// flicker the TV
+setInterval(()=>{if(OTV)OTV.material.color.setHex([0x4a5a50,0x182018,0x6a7a70,0x101410][Math.random()*4|0])},140);
+})();</script>
+<script>(function(){
+const $$=id=>document.getElementById(id);const R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.random()*a.length|0];
+// ===== smaller room: partitions close in the sides =====
+[-1,1].forEach(k=>{box(office,.3,4.2,5.7,k*5.9,2.1,2.7,oWall);box(office,.3,.25,5.7,k*5.72,.12,2.7,M(0x15151a))});
+// ===== desk at about half size =====
+(function(){const g=new THREE.Group();g.position.set(0,0,-3.9);office.add(g);
+[...office.children].forEach(c=>{if(c===g||c.userData&&c.userData.isBtn||c.isLight)return;const p=c.position;if(Math.abs(p.x)<=2.7&&p.z>-3.92&&p.z<-2.2&&p.y<1.9&&c.parent===office&&!(c.geometry&&c.geometry.type==='PlaneGeometry'&&Math.abs(p.z+3.98)<.05)){office.remove(c);c.position.z+=3.9;g.add(c)}});
+g.scale.set(.55,.8,.55)})();
+// ===== 2.0 label =====
+const mt=$$('mtitle');if(mt&&!/2\.0/.test(mt.innerHTML))mt.innerHTML+='<div style="font-size:.38em;color:#e22;margin-top:6px">2.0</div>';
+// ===== varied jumpscares =====
+const st=document.createElement('style');st.textContent='#scare.v1{filter:invert(1) contrast(1.6)!important}#scare.v2{filter:drop-shadow(14px 0 0 rgba(255,0,0,.8)) drop-shadow(-14px 0 0 rgba(0,255,255,.8)) contrast(1.4)!important}#scare.v3{animation:sctilt .1s infinite!important}@keyframes sctilt{0%{transform:rotate(-7deg) scale(1.25)}50%{transform:rotate(6deg) scale(1.4)}100%{transform:rotate(-3deg) scale(1.3)}}#blk{position:fixed;inset:0;background:#000;z-index:210;display:none}#twist,#qte{position:fixed;left:0;right:0;text-align:center;font:12px PS2P,monospace;pointer-events:none;z-index:16;text-shadow:2px 2px #000}#twist{top:12%;color:#fc4;opacity:0;transition:opacity .6s}#qte{top:6%;color:#fff;display:none;line-height:2}#qte b{color:#ff0;font-size:22px;letter-spacing:.25em}#qte i{display:block;height:6px;background:#c22;margin:6px auto 0;width:260px;transform-origin:left}';document.head.appendChild(st);
+const blk=document.createElement('div');blk.id='blk';document.body.appendChild(blk);
+const oDS=doScare;doScare=function(m,done,mode){const el=$$('scare'),v=Math.random()*6|0;el.classList.remove('v1','v2','v3');
+const go=()=>{if(v===1)el.classList.add('v1');else if(v===2)el.classList.add('v2');else if(v===3)el.classList.add('v3');return oDS.call(this,m,done,mode)};
+if(v===4||v===5){ // lights die, silence, then it is RIGHT THERE
+ blk.style.display='block';try{A.silence&&A.silence()}catch(e){}setTimeout(()=>{blk.style.display='none';go()},v===4?650:1100);return}
+return go()};
+// ===== nightly twists =====
+const TW=[['LEAKY BATTERY','Power drains 50% faster',{leak:1}],['RESTLESS HOUSE','Strange things happen twice as often',{busy:1}],['BAD SIGNAL','Cameras keep dropping out',{sig:1}],['LONG NIGHT','Nothing special. Just stay alive.',{}],['SHORT FUSE','Lights keep shorting out',{fuse:1}]];
+window.MUT={};const tw=document.createElement('div');tw.id='twist';document.body.appendChild(tw);let seen=false;
+setInterval(()=>{if(S.mode==='play'){if(!seen&&(S.t||0)<6){seen=true;const w=['',' ',{}];window.MUT=w[2];if(w[0]){tw.innerHTML='TONIGHT: '+w[0]+'<br><span style="font-size:9px;color:#ddd">'+w[1]+'</span>';tw.style.opacity=1;setTimeout(()=>tw.style.opacity=0,5000)}}}else if(S.mode!=='dead')seen=false},500);
+setInterval(()=>{if(S.mode!=='play'||S.reading||S.day)return;if(MUT.sig&&Math.random()<.5){const c=pick(CAMS);S.camDown[c]=(S.camDown[c]||0)+20}},30000);
+setInterval(()=>{if(S.mode!=='play'||S.reading||S.day||!MUT.fuse)return;const k=pick(['L','R','W']);if(S.lights[k]){S.lights[k]=0;try{setBtn(B['light'+k],0);A.noise(.3,.4,{type:'highpass',f:3000})}catch(e){}}},20000);
+// ===== new task: keep the breaker alive =====
+const q=document.createElement('div');q.id='qte';document.body.appendChild(q);let task=null,nt=R(60,110);
+const keys='ZXCVBN';
+function startTask(){const seq=[0,1,2,3].map(()=>keys[Math.random()*6|0]);task={seq,i:0,t:9};draw();q.style.display='block';try{A.tone(900,.12,'square',.15);A.tone(700,.12,'square',.15,{delay:.15})}catch(e){}}
+function draw(){q.innerHTML='BREAKER FAILING!<br>TYPE: <b>'+task.seq.map((k,i)=>i<task.i?'<span style="color:#4f4">'+k+'</span>':k).join(' ')+'</b><i style="transform:scaleX('+Math.max(0,task.t/9)+')"></i>'}
+function end(ok){q.style.display='none';task=null;nt=R(70,130);if(ok){S.power=Math.min(START,S.power+START*.03);try{A.click()}catch(e){}}else{S.power=Math.max(1,S.power-START*.08);const c=pick(CAMS);S.camDown[c]=(S.camDown[c]||0)+25;try{A.tone(80,1,'sawtooth',.5,{to:30});A.noise(.5,.5,{f:300,to:80})}catch(e){}}}
+addEventListener('keydown',e=>{if(!task)return;const k=e.key.toUpperCase();if(k.length!==1||!keys.includes(k))return;e.stopPropagation();if(k===task.seq[task.i]){task.i++;try{A.click()}catch(x){}if(task.i>=4)end(true);else draw()}else{task.i=0;draw()}},true);
+let lt=performance.now();setInterval(()=>{const n=performance.now(),dt=Math.min(1,(n-lt)/1000);lt=n;if(S.mode!=='play'||S.reading||S.day||S.out){if(task){q.style.display='none';task=null}return}
+if(task){task.t-=dt;if(task.t<=0)end(false);else draw();return}nt-=dt;if(nt<=0&&(S.night||1)>=1)startTask()},250);
+})();</script>
+<script>(function(){
+const $$=id=>document.getElementById(id);const R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.random()*a.length|0];
+const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+const st=document.createElement('style');st.textContent='.jov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:75;display:none;align-items:center;justify-content:center;font:10px PS2P,monospace;color:#fff}.jov.on{display:flex}.jbox{background:#14161a;border:3px solid #fff;padding:18px 22px;min-width:340px;max-width:92vw;text-align:center;line-height:1.9}.jbox h3{margin:0 0 8px;color:#fc4;font-size:13px}.jbox .bt{margin:8px 4px 0}.wd{position:absolute;width:26px;height:26px;border-radius:50%;border:3px solid #000;cursor:pointer}.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}.fg div{border:2px solid #555;padding:8px 4px;cursor:pointer;font-size:8px;background:#0a0a0c}.fg div.bad{border-color:#a33}.fg div.gone{visibility:hidden}.tk{text-align:left;margin:4px 0}.tk.d{color:#4f4;text-decoration:line-through}#jx_tut{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:min(520px,90vw);background:#101216;border:3px solid #fc4;padding:14px 18px;z-index:80;font:10px PS2P,monospace;color:#fff;line-height:1.9;display:none}#tut b{color:#fc4}#tut .bt{margin:10px 6px 0 0;padding:6px 10px}#jx_tst{position:fixed;top:16%;left:0;right:0;text-align:center;font:13px PS2P,monospace;color:#4f4;text-shadow:2px 2px #000;z-index:76;pointer-events:none;opacity:0;transition:opacity .4s}';document.head.appendChild(st);
+const mk=(id,h)=>{const o=document.createElement('div');o.className='jov';o.id=id;o.innerHTML='<div class="jbox">'+h+'</div>';document.body.appendChild(o);return o};
+const toast=document.createElement('div');toast.id='jx_tst';document.body.appendChild(toast);let tt=0;const say=t=>{toast.textContent=t;toast.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>toast.style.opacity=0,2600)};
+// ===== task system =====
+const POOL={wires:{n:'FIX THE POWER BOX WIRES',h:'Look LEFT. Click the power box on the left wall and connect matching wires.'},files:{n:'CLEAR CORRUPTED COMPUTER FILES',h:'Click the COMPUTER on your desk. Delete only the red corrupted files.'},cams:{n:'CHECK CAMERAS',h:'Open the cameras (SPACE) and watch each listed camera for a few seconds.'},lights:{n:'INSPECT THE LIGHTS',h:'Turn on the LEFT light, RIGHT light and WINDOW light at least once each.'},sheet:{n:'SIGN THE TIMESHEET',h:'Click the CLIPBOARD, then enter your employee ID on the timesheet.'}};
+let T=null;
+function newShift(){const n=Math.min(5,2+(S.night||1));const ids=Object.keys(POOL).sort(()=>Math.random()-.5);const picked=(S.night||1)===1?['wires','files','cams']:ids.slice(0,n);
+const cams=[...CAMS].sort(()=>Math.random()-.5).slice(0,3);T={list:picked.map(id=>({id,done:false})),cams:Object.fromEntries(cams.map(c=>[c,0])),lights:{L:0,R:0,W:0},pin:String(1000+Math.random()*9000|0),paid:0};LS('x',0)}
+const left=()=>T?T.list.filter(t=>!t.done).length:0;
+function complete(id){if(!T)return;const t=T.list.find(x=>x.id===id);if(!t||t.done)return;t.done=true;T.paid++;S.power=Math.min(START,S.power+START*.03);say('TASK COMPLETE: '+POOL[id].n);try{A.click();A.tone(660,.15,'square',.12);A.tone(880,.2,'square',.12,{delay:.15})}catch(e){}renderClip()}
+// clipboard overlay
+const clip=mk('jx_clip','');function renderClip(){if(!T){clip.firstChild.innerHTML='<h3>NO SHIFT</h3>';return}
+clip.firstChild.innerHTML='<h3>NIGHT SHIFT ORDERS</h3><div style="color:#aaa;font-size:8px">COMPLETE BEFORE 6 AM. EACH TASK = BONUS POWER + PAY.</div><div style="text-align:left;margin-top:10px">'+T.list.map((t,i)=>'<div class="tk'+(t.done?' d':'')+'">'+(t.done?'[X] ':'[ ] ')+POOL[t.id].n+'<div style="font-size:8px;color:#999;text-decoration:none">'+(t.id==='cams'?'CAMS '+Object.keys(T.cams).map(c=>String(CAMS.indexOf(c)+1).padStart(2,'0')).join(', ')+' - ':'')+POOL[t.id].h+'</div></div>').join('')+'</div><div style="margin-top:8px;color:#fc4">EMPLOYEE ID: '+T.pin+'</div>'+(T.list.some(t=>t.id==='sheet'&&!t.done)?'<div style="margin-top:8px"><input id="jx_pin" maxlength="4" placeholder="ID" style="width:90px;font:12px PS2P,monospace;background:#000;color:#fff;border:2px solid #fff;padding:6px;text-align:center"> <button class="bt" id="jx_pinok">SIGN</button></div>':'')+'<button class="bt" id="jx_clx">CLOSE (T)</button>';
+$$('jx_clx').onclick=()=>clip.classList.remove('on');const pk=$$('jx_pinok');if(pk)pk.onclick=()=>{if($$('jx_pin').value===T.pin){complete('sheet');clip.classList.remove('on')}else say('WRONG ID')}}
+// wires
+const wov=mk('jx_wov','<h3>REPAIR POWER BOX</h3><div style="color:#aaa;font-size:8px">CLICK A WIRE ON THE LEFT, THEN ITS MATCH ON THE RIGHT</div><div id="jx_wbox" style="position:relative;width:300px;height:210px;margin:10px auto"><svg id="jx_wsvg" width="300" height="210" style="position:absolute;inset:0"></svg></div><button class="bt" id="jx_wx">CLOSE</button>');
+let wsel=null,wdone=0;const WC=['#e22','#28f','#fd2','#2d4'];
+function wBuild(){const box=$$('jx_wbox');box.querySelectorAll('.wd').forEach(e=>e.remove());$$('jx_wsvg').innerHTML='';wdone=0;wsel=null;const r=[0,1,2,3].sort(()=>Math.random()-.5);
+for(let i=0;i<4;i++){[[0,i],[274,r[i]]].forEach(([x,c],side)=>{const d=document.createElement('div');d.className='wd';d.style.cssText+='left:'+x+'px;top:'+(i*56+8)+'px;background:'+WC[c];d.dataset.c=c;d.dataset.s=x?'r':'l';d.onclick=()=>{if(d.dataset.done)return;if(d.dataset.s==='l'){box.querySelectorAll('.wd').forEach(e=>e.style.outline='');wsel=d;d.style.outline='3px solid #fff'}else if(wsel){if(wsel.dataset.c===d.dataset.c){const a=wsel.getBoundingClientRect(),b=d.getBoundingClientRect(),o=box.getBoundingClientRect();const ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('x1',a.left-o.left+13);ln.setAttribute('y1',a.top-o.top+13);ln.setAttribute('x2',b.left-o.left+13);ln.setAttribute('y2',b.top-o.top+13);ln.setAttribute('stroke',WC[+d.dataset.c]);ln.setAttribute('stroke-width','6');$$('jx_wsvg').appendChild(ln);wsel.dataset.done=d.dataset.done=1;wsel.style.outline='';wsel=null;try{A.click()}catch(e){}if(++wdone>=4){setTimeout(()=>{wov.classList.remove('on');complete('wires')},350)}}else{wsel.style.outline='';wsel=null;try{A.tone(120,.2,'square',.2)}catch(e){}}}};box.appendChild(d)})}}
+$$('jx_wx').onclick=()=>wov.classList.remove('on');
+// files
+const fov=mk('jx_fov','<h3>OFFICE PC - FILE MANAGER</h3><div style="color:#aaa;font-size:8px">DELETE ONLY THE <span style="color:#e55">CORRUPTED</span> FILES</div><div class="fg" id="jx_fg"></div><button class="bt" id="jx_fx">CLOSE</button>');
+const FN=['timesheet','menu_v2','party_list','safety','invoice','vendor','notes','cams_log','payroll','recipe','floor_plan','manual'];let bad=0;
+function fBuild(){const g=$$('jx_fg');g.innerHTML='';const idx=[...FN.keys()].sort(()=>Math.random()-.5).slice(0,12);const badSet=new Set(idx.slice(0,4));bad=4;idx.forEach(i=>{const d=document.createElement('div');const b=badSet.has(i);d.className=b?'bad':'';d.innerHTML=(b?'<span style="color:#e55">'+FN[i].toUpperCase().split('').map(c=>Math.random()<.3?'#':c).join('')+'.ERR</span>':FN[i]+'.doc');d.onclick=()=>{if(d.classList.contains('gone'))return;if(b){d.classList.add('gone');try{A.click()}catch(e){}if(--bad<=0){setTimeout(()=>{fov.classList.remove('on');complete('files')},350)}}else{say('THAT WAS A GOOD FILE! (RESTORED)');S.power=Math.max(1,S.power-START*.01);try{A.tone(120,.2,'square',.2)}catch(e){}}};g.appendChild(d)})}
+$$('jx_fx').onclick=()=>fov.classList.remove('on');
+// 3D props: clipboard, power box, computer hit area
+const cvs=document.createElement('canvas');cvs.width=128;cvs.height=160;const c2=cvs.getContext('2d');c2.fillStyle='#c8a878';c2.fillRect(0,0,128,160);c2.fillStyle='#eee';c2.fillRect(10,18,108,134);c2.fillStyle='#222';c2.font='bold 12px monospace';c2.fillText('SHIFT ORDERS',16,34);for(let i=0;i<5;i++){c2.fillRect(18,50+i*20,10,10);c2.fillRect(34,54+i*20,70,3)}c2.fillStyle='#777';c2.fillRect(44,4,40,14);
+const clipM=new THREE.Mesh(new THREE.BoxGeometry(.36,.02,.46),[M(0x6a4a2a),M(0x6a4a2a),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cvs)}),M(0x6a4a2a),M(0x6a4a2a),M(0x6a4a2a)]);clipM.position.set(.72,.83,-3.35);clipM.rotation.y=-.25;clipM.userData={action:'clip',isBtn:true};office.add(clipM);buttons.push(clipM);
+const pb=new THREE.Group();pb.position.set(-5.7,1.7,1.6);office.add(pb);const pbm=new THREE.Mesh(new THREE.BoxGeometry(.14,.95,.7),M(0x3a3e44));pbm.userData={action:'pbox',isBtn:true};pb.add(pbm);buttons.push(pbm);
+const pl=new THREE.Mesh(new THREE.PlaneGeometry(.55,.3),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture((()=>{const c=document.createElement('canvas');c.width=128;c.height=64;const x=c.getContext('2d');x.fillStyle='#2a2e34';x.fillRect(0,0,128,64);x.fillStyle='#fc4';x.font='bold 18px monospace';x.fillText('POWER',24,28);x.fillStyle='#e22';x.fillText('! HV !',30,52);return c})())}));pl.position.set(.075,.15,0);pl.rotation.y=Math.PI/2;pb.add(pl);
+const led=new THREE.Mesh(new THREE.SphereGeometry(.04,8,8),new THREE.MeshBasicMaterial({color:0xff2020}));led.position.set(.09,-.25,.2);pb.add(led);setInterval(()=>{led.visible=!(T&&T.list.find(t=>t.id==='wires'&&t.done))||Math.random()<.5;if(T&&T.list.find(t=>t.id==='wires'&&t.done))led.material.color.setHex(0x22ee44)},500);
+const pcHit=new THREE.Mesh(new THREE.BoxGeometry(.5,.4,.3),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));pcHit.position.set(-.8,.95,-3.6);pcHit.userData={action:'pc',isBtn:true};office.add(pcHit);buttons.push(pcHit);
+// act2 hook
+const oA=act2;act2=function(a){if(a==='clip'){renderClip();clip.classList.add('on');return}if(a==='pbox'){if(T&&T.list.find(t=>t.id==='wires'&&!t.done)){wBuild();wov.classList.add('on')}else say('POWER BOX: NOTHING TO FIX');return}if(a==='pc'){if(T&&T.list.find(t=>t.id==='files'&&!t.done)){fBuild();fov.classList.add('on')}else say('PC: NOTHING TO DO');return}return oA.apply(this,arguments)};
+addEventListener('keydown',e=>{if(S.mode!=='play')return;if(e.code==='KeyT'&&document.activeElement.tagName!=='INPUT'){if(clip.classList.contains('on'))clip.classList.remove('on');else{renderClip();clip.classList.add('on')}}if(e.code==='Escape'){[clip,wov,fov].forEach(o=>o.classList.remove('on'))}});
+// tracking: cameras + lights
+let lt=performance.now();setInterval(()=>{const n=performance.now(),dt=Math.min(1,(n-lt)/1000);lt=n;if(!T||S.mode!=='play')return;
+if(S.cam&&T.cams[S.camRoom]!==undefined&&T.cams[S.camRoom]<3)T.cams[S.camRoom]+=dt;if(Object.values(T.cams).every(v=>v>=3))complete('cams');
+['L','R','W'].forEach(k=>{if(S.lights[k])T.lights[k]=1});if(T.lights.L&&T.lights.R&&T.lights.W)complete('lights')},250);
+// new shift each night
+let seen=false;setInterval(()=>{if(S.mode==='play'){if(!seen&&(S.t||0)<6){seen=true;newShift();if((S.night||1)===1&&!S.cu&&LS('stn_tut2')!=='1')setTimeout(tutorial,1200);else say('SHIFT STARTED - PRESS T FOR YOUR ORDERS')}}else if(S.mode!=='dead')seen=false},500);
+// payday
+const oW=win;win=function(){const r=oW.apply(this,arguments);try{if(T){const d=T.list.filter(t=>t.done).length,tot=T.list.length;$$('wt').innerHTML+='<br><span style="font-size:11px;color:'+(d===tot?'#4f4':'#fc4')+'">TASKS DONE: '+d+'/'+tot+(d===tot?' - FULL PAY + BONUS':' - PAY DOCKED $'+(tot-d)*5)+'</span>'}}catch(e){}return r};
+// ===== night 1 tutorial =====
+const tut=document.createElement('div');tut.id='jx_tut';document.body.appendChild(tut);
+const STEPS=['<b>WELCOME TO YOUR FIRST SHIFT.</b><br>You are the night guard at the pizzeria. Survive until 6 AM and finish your work orders.','<b>CLIPBOARD</b> (on your desk)<br>Click it or press <b>T</b> to see tonight\'s tasks. Finishing tasks gives bonus power and full pay.','<b>DOORS AND LIGHTS</b><br>Use the buttons on each side. A light shows what is outside. If something is there, close the door. Doors cost power.','<b>POWER AND USAGE</b> (bottom left)<br>More things on = more usage. Every 8 seconds you lose power equal to your usage. At 0% everything shuts off.','<b>CAMERAS</b><br>Press <b>SPACE</b> to open them and click the map to change rooms. <b>F</b> = flashlight. Some tasks need you to watch certain cameras.','<b>POWER BOX AND COMPUTER</b><br>The power box is on the LEFT wall (move your mouse to the left edge). The computer is on your desk. Click them for your repair tasks.','<b>REMEMBER</b><br>You are not alone in here. Listen to the phone calls, watch your power, and do your job. Good luck.'];
+let ts=0;function tutorial(){ts=0;S.reading=true;showT()}
+function showT(){tut.style.display='block';tut.innerHTML=STEPS[ts]+'<br><button class="bt" id="jx_tn">'+(ts===STEPS.length-1?'START SHIFT':'NEXT')+'</button><button class="bt" id="jx_ts">SKIP</button>';$$('jx_tn').onclick=()=>{if(++ts>=STEPS.length)endT();else showT()};$$('jx_ts').onclick=endT}
+function endT(){tut.style.display='none';S.reading=false;LS('stn_tut2','1')}
+})();</script>
 </body></html>
